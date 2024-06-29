@@ -5,6 +5,7 @@ import { CommonRoutesInitData, HttpServer } from "../../models/common.models";
 
 export class SocketRoutes extends CommonRoutesConfig {
 
+  private activeSockets: string[] = [];
   private serverIO!: Server;
 
   constructor(app: Application, server: HttpServer){
@@ -23,30 +24,55 @@ export class SocketRoutes extends CommonRoutesConfig {
   }
 
   private initSocketServer(httpServer: HttpServer): void{
-    this.serverIO = new Server(httpServer);
+    this.serverIO = new Server(httpServer, {  
+      cors: {
+        //@ts-ignore
+        origins: ["http://localhost:5500/dist"]
+      }
+    });
   }
 
   configureRoute(): Application {
-
+    console.log("s")
     this.serverIO.on('connection', socket => {
-      // socket.on('join-room', this.clientJoinRoomCallback);
-      socket.on('join-room', (roomId, userId) => {
-        socket.join(roomId)
+      console.log("first")
+      socket.on("disconnect", () => {
+        
+        this.activeSockets = this.activeSockets.filter(
+          (existingSocket) => existingSocket !== socket.id
+        );
 
-        //@ts-ignore
-        socket.to(roomId).broadcast.emit('user-connected', userId)
-    
-        socket.on('disconnect', () => {
-          //@ts-ignore
-          socket.to(roomId).broadcast.emit('user-disconnected', userId)
-        })
-      })
+        socket.broadcast.emit("remove-user", {
+          socketId: socket.id,
+        });
+      });
+
+      socket.on("make-answer", (data) => {
+        socket.to(data.to).emit("answer-made", {
+          socket: socket.id,
+          answer: data.answer
+        });
+      });
+
+      const existingSocket = this.activeSockets.find(
+        (existingSocket) => existingSocket === socket.id
+      );
+
+      if (!existingSocket) {
+        this.activeSockets.push(socket.id);
+
+        socket.emit("update-user-list", {
+          users: this.activeSockets.filter(
+            (existingSocket) => existingSocket !== socket.id
+          ),
+        });
+
+        socket.broadcast.emit("update-user-list", {
+          users: [socket.id],
+        });
+      };
     })
 
     return this.getApp();
-  }
-
-  private clientJoinRoomCallback(): void{
-
   }
 }
