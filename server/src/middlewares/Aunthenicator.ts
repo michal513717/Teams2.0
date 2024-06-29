@@ -13,19 +13,21 @@ class Authenticator {
         }
     }
     public static authenticate(req: Request, res: Response, next: NextFunction): void {
-        const authHeader = req.headers.authorization;
+        try{
+            const authHeader = req.headers.authorization;
 
-        if (authHeader) {
+            if (!authHeader){
+                throw new Error("Token Not Found");
+            }
             const token = authHeader.split(' ')[1];
             const payload = Authenticator.verifyToken(token);
 
-            if (payload) {
-                next();
-            } else {
-                res.status(401).json({ message: 'Invalid token' });
+            if(payload == null){
+                throw new Error("Invalid Token");
             }
-        } else {
-            res.status(401).json({ message: 'Authorization header missing' });
+            next();
+        } catch(error){
+            res.status(401).json(error)
         }
     }
 }
