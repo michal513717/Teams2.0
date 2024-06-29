@@ -3,7 +3,6 @@ import { Request, Response, NextFunction } from 'express';
 import { SECRET } from '../utils/configs/secret';
 
 class Authenticator {
-    //private static SECRET_KEY = 'your_secret_key';
 
     public static verifyToken(token: string): JwtPayload | null {
         try {
