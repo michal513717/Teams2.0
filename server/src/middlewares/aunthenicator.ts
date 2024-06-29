@@ -1,6 +1,6 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import { SECRET } from './utils/configs/secret';
+import { SECRET } from '../utils/configs/secret';
 
 class Authenticator {
     //private static SECRET_KEY = 'your_secret_key';
