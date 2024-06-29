@@ -1,1 +1,1 @@
-SECRET = "your_secret_key"
+export const SECRET = "your_secret_key"
