@@ -7,7 +7,7 @@ class Authenticator {
 
     public static verifyToken(token: string): JwtPayload | null {
         try {
-            const payload = jwt.verify(token, Authenticator.SECRET) as JwtPayload;
+            const payload = jwt.verify(token, SECRET) as JwtPayload;
             return payload;
         } catch (error) {
             return null;
