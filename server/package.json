@@ -8,6 +8,7 @@
         "build": "turbo build"
     },
     "dependencies": {
+        "@types/jsonwebtoken": "^9.0.6",
         "@types/socket.io": "^3.0.2",
         "cors": "^2.8.5",
         "dotenv": "^16.0.3",
