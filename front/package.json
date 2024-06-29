@@ -20,7 +20,9 @@
     "e2e": "playwright test"
   },
   "dependencies": {
-    "electron-updater": "^6.1.8"
+    "electron-updater": "^6.1.8",
+    "peerjs": "^1.5.4",
+    "socket.io-client": "^4.7.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.42.1",

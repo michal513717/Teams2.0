@@ -1,5 +1,6 @@
+
+
 export const APPLICATION_CONFIG = {
     DEBUG_REQUEST: true,
-    IS_MIDDLEWARE_ENABLE: true,
     APPLICATION_PORT: 8080,
 };
