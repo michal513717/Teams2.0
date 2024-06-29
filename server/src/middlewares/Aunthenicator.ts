@@ -2,7 +2,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
 class Authenticator {
-    private static SECRET_KEY = 'your_secret_key';
+    //private static SECRET_KEY = 'your_secret_key';
 
     public static verifyToken(token: string): JwtPayload | null {
         try {
