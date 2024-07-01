@@ -33,9 +33,9 @@ export class SocketRoutes extends CommonRoutesConfig {
   }
 
   configureRoute(): Application {
-    console.log("s")
+
     this.serverIO.on('connection', socket => {
-      console.log("first")
+
       socket.on("disconnect", () => {
         
         this.activeSockets = this.activeSockets.filter(

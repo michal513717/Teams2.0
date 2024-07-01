@@ -13,8 +13,8 @@ export class AuthRouter extends CommonRoutesConfig {
 
     const authRouter = express.Router();
 
-    authRouter.get('/register', registerController);
-    authRouter.get('/login', loginController);
+    authRouter.post('/register', registerController);
+    authRouter.post('/login', loginController);
 
     this.app.use('/auth', authRouter);
 
