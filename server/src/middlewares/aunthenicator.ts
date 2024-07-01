@@ -12,6 +12,7 @@ class Authenticator {
             return null;
         }
     }
+    
     public static authenticate(req: Request, res: Response, next: NextFunction): void {
         try{
             const authHeader = req.headers.authorization;

@@ -9,6 +9,7 @@ import * as http from "http";
 import cors from "cors";
 import { SocketRoutes } from "./routes/v0.0.1/sockets.routes";
 import { HttpServer, Logger } from "./models/common.models";
+import { AuthRouter } from "./routes/v0.0.1/auth.routes";
 
 export class MainApp {
 
@@ -65,6 +66,7 @@ export class MainApp {
 
     this.routes = [];
 
+    this.routes.push(new AuthRouter(application));
     this.routes.push(new ExampleRoute(application));
     this.routes.push(new SocketRoutes(application, this.server));
     this.routes.push(new NotValidRoutes(application));
