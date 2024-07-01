@@ -3,7 +3,7 @@ import { Collection, MongoClient } from "mongodb";
 import MongoLocalClient from "../database/index";
 import { DatabaseManagerConfig } from "../utils/configs/databaseManagerConfig";
 import { MongoDatabase } from "../models/common.models";
-import { UserSchema } from "../models/mongose.schema";
+import { UserDatabaseSchema } from "../models/mongose.schema";
 
 class DatabaseManager {
 
@@ -30,12 +30,17 @@ class DatabaseManager {
     return await this.database.collection<Schema>(DatabaseManager.COLLECTIONS[collectionName]);
   };
 
-  public async isUserExist(userName: string): Promise<Promise<boolean>>{
+  public async isUserExist(userName: string): Promise<boolean>{
     const collection = await this.getCollection("USERS_COLLECTION");
     return await collection.findOne({ userName: userName }) !== null;
   };
 
-  public async addNewUser(data: UserSchema): Promise<void> {
+  public async getUser(userName: string): Promise<null | UserDatabaseSchema>{
+    const collection = await this.getCollection<UserDatabaseSchema>("USERS_COLLECTION");
+    return await collection.findOne({ userName: userName });
+  }
+
+  public async addNewUser(data: UserDatabaseSchema): Promise<void> {
     const collection = await this.getCollection<typeof data>("USERS_COLLECTION");
     await collection.insertOne(data);
   }
