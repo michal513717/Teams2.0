@@ -76,14 +76,12 @@ export class SocketRoutes extends CommonRoutesConfig {
 
   private async configureChatConnection(socket: any): Promise<void> {
 
-
     socket.emit("init-chats", await databaseManager.getUserChatHistory(socket.userName));
 
     socket.broadcast.emit("user-connected", {
       userID: socket.userID,
       username: socket.username,
       connected: true,
-      messages: [],
     });
 
     socket.on('private-message', async ({ content, to }: any) => {

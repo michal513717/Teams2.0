@@ -5,13 +5,11 @@ import { ExampleRoute } from "./routes/v0.0.1/example.routes";
 import { SocketRoutes } from "./routes/v0.0.1/sockets.routes";
 import { HttpServer, Logger } from "./models/common.models";
 import { AuthRouter } from "./routes/v0.0.1/auth.routes";
-import { databaseManager } from "./managers/databaseManager";
 import express, { Application } from "express";
 import { Debugger } from "./utils/debugger";
 import LoggerHelper from "./utils/logger";
 import * as http from "http";
 import cors from "cors";
-import { ChatSockets } from "./routes/v0.0.1/chatSocket.routes";
 
 export class MainApp {
 
