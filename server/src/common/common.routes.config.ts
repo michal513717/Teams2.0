@@ -1,15 +1,12 @@
-import { CommonRoutesInitData } from "../models/common.models";
-import { Logger } from "../models/common.models";
-import LoggerHelper from "./../utils/logger";
 import type { Application } from "express";
 import * as http from "http";
+import { CommonRoutesInitData } from "../models/common.models";
 
 export abstract class CommonRoutesConfig {
 
   private routeName: string;
   private version: string;
   protected app: Application;
-  protected logger!: Logger;
 
   public static statusMessage = {
     FAILED: "Failed",
@@ -31,7 +28,6 @@ export abstract class CommonRoutesConfig {
     this.app = app;
     this.version = version;
 
-    this.initLogger();
     this.init({
       app,
       routeName,
@@ -44,10 +40,6 @@ export abstract class CommonRoutesConfig {
 
   //To implements methods before configure routes
   protected init(initData: CommonRoutesInitData): void{}
-
-  public initLogger(): void {
-    this.logger = LoggerHelper.getLogger(this.getName());
-  }
 
   public getName(): string {
     return this.routeName;

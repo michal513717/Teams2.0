@@ -100,6 +100,14 @@ class DatabaseManager {
     await collection.insertOne(record);
   }
 
+  private async countCursorData(data: FindCursor): Promise<number>{
+    let counter = 0;
+    for await(const doc of data){
+      counter++;
+    }
+    return counter;
+  }
+
   public async getUserChatHistory(userName:string){
     const chatHistory = await this.getAllMesseges(userName);
     let result: ChatInitData[] = [];
@@ -115,14 +123,6 @@ class DatabaseManager {
     })
 
     return result;
-  }
-
-  private async countCursorData(data: FindCursor): Promise<number>{
-    let counter = 0;
-    for await(const doc of data){
-      counter++;
-    }
-    return counter;
   }
 };
 
