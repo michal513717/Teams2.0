@@ -1,6 +1,6 @@
-import type { Application } from "express";
-import { CommonRoutesConfig } from "../../common/common.routes.config";
 import { exampleController } from "../../controllers/exampleRouter.controller";
+import { CommonRoutesConfig } from "../../common/common.routes.config";
+import type { Application } from "express";
 import express from "express";
 
 export class ExampleRoute extends CommonRoutesConfig {

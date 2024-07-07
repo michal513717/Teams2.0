@@ -1,12 +1,20 @@
-import { Application } from "express";
+import { ClientToServerEvents, CommonRoutesInitData, HttpServer, InterServerEvents, ServerToClientEvents, SocketConection, SocketData } from "../../models/common.models";
 import { CommonRoutesConfig } from "../../common/common.routes.config";
+import { Application } from "express";
 import { Server } from "socket.io";
-import { CommonRoutesInitData, HttpServer } from "../../models/common.models";
+import { chatSessionManager } from "../../managers/chatSessionManager";
+import { databaseManager } from "../../managers/databaseManager";
+import { ConversationData } from "../../models/mongose.schema";
+import { ChatMiddlewareHandler } from "../../middlewares/chatMiddleware";
 
 export class SocketRoutes extends CommonRoutesConfig {
 
-  private activeSockets: string[] = [];
-  private serverIO!: Server;
+  private serverIO!: Server<     
+    ClientToServerEvents,
+    ServerToClientEvents,
+    InterServerEvents,
+    SocketData
+  >;
 
   constructor(app: Application, server: HttpServer){
     
@@ -16,63 +24,101 @@ export class SocketRoutes extends CommonRoutesConfig {
   protected init(initData: CommonRoutesInitData): void {
 
     if(initData.httpServer !== null){
-
       this.initSocketServer(initData.httpServer);
+    } else {
+      this.logger.warn("Server http not provided");
     }
 
     super.init(initData);
   }
 
   private initSocketServer(httpServer: HttpServer): void{
-    this.serverIO = new Server(httpServer, {  
+    this.serverIO = new Server<
+      ClientToServerEvents,
+      ServerToClientEvents,
+      InterServerEvents,
+      SocketData
+    >(httpServer, {  
       cors: {
-        //@ts-ignore
-        origins: ["http://localhost:5500/dist"]
+        origin: "*"
       }
     });
   }
 
-  configureRoute(): Application {
+  public configureRoute(): Application {
+
+    //* Firstly we need check token or sessionID
+    this.serverIO.use(ChatMiddlewareHandler.verifyConnection);
+
+    //* If connection contains token or sessionID, we can create session
+    this.serverIO.use(ChatMiddlewareHandler.createSession);
 
     this.serverIO.on('connection', socket => {
 
-      socket.on("disconnect", () => {
-        
-        this.activeSockets = this.activeSockets.filter(
-          (existingSocket) => existingSocket !== socket.id
-        );
+      this.configureWebRtcConnection(socket);
 
-        socket.broadcast.emit("remove-user", {
-          socketId: socket.id,
-        });
-      });
-
-      socket.on("make-answer", (data) => {
-        socket.to(data.to).emit("answer-made", {
-          socket: socket.id,
-          answer: data.answer
-        });
-      });
-
-      const existingSocket = this.activeSockets.find(
-        (existingSocket) => existingSocket === socket.id
-      );
-
-      if (!existingSocket) {
-        this.activeSockets.push(socket.id);
-
-        socket.emit("update-user-list", {
-          users: this.activeSockets.filter(
-            (existingSocket) => existingSocket !== socket.id
-          ),
-        });
-
-        socket.broadcast.emit("update-user-list", {
-          users: [socket.id],
-        });
-      };
+      this.configureChatConnection(socket);
     })
 
     return this.getApp();
+  };
+
+  
+  //* WebRTC
+  private configureWebRtcConnection(socket: SocketConection): void {
+    socket.on("make-answer", (data) => {
+      socket.to(data.to).emit("answer-made", {
+        socket: socket.id,
+        answer: data.answer
+      });
+    });
+  }
+
+  private async configureChatConnection(socket: any): Promise<void> {
+
+
+    socket.emit("init-chats", await databaseManager.getUserChatHistory(socket.userName));
+
+    socket.broadcast.emit("user-connected", {
+      userID: socket.userID,
+      username: socket.username,
+      connected: true,
+      messages: [],
+    });
+
+    socket.on('private-message', async ({ content, to }: any) => {
+
+      const recivedID = chatSessionManager.findSocketIdByUserName(to);
+
+      databaseManager.saveMessage({
+        to: to,
+        message: content,
+        from: socket.userName
+      });
+      
+      socket
+        .to(recivedID)
+        .to(socket.userID)
+        .emit("private-message", {
+          to: to,
+          message: content,
+          from: socket.userName
+        });
+    });
+
+    socket.on('disconnect', async() => {
+
+      socket.broadcast.emit('user-disconnected', {
+        userID: socket.userID,
+        userName: socket.userName,
+        connected: false
+      });
+
+      chatSessionManager.saveSession(socket.sessionID, {
+        userID: socket.userID,
+        userName: socket.userName,
+        connected: false
+      });
+    });
   }
 }

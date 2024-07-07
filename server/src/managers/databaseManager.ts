@@ -3,7 +3,7 @@ import { Collection, MongoClient, ObjectId, Timestamp } from "mongodb";
 import MongoLocalClient from "../database/index";
 import { DatabaseManagerConfig } from "../utils/configs/databaseManagerConfig";
 import { MongoDatabase } from "../models/common.models";
-import { ChatDatabaseSchema, ConversationData, UserDatabaseSchema } from "../models/mongose.schema";
+import { ChatDatabaseSchema, ChatInitData, ConversationData, UserDatabaseSchema } from "../models/mongose.schema";
 
 class DatabaseManager {
 
@@ -98,6 +98,23 @@ class DatabaseManager {
     };
 
     await collection.insertOne(record);
+  }
+
+  public async getUserChatHistory(userName:string){
+    const chatHistory = await this.getAllMesseges(userName);
+    let result: ChatInitData[] = [];
+
+    chatHistory.forEach((chatRecord) => {
+      chatRecord.messages.forEach((message) => {
+        result.push({
+          from: message.sender,
+          message: message.message,
+          to: message.sender === chatRecord.members[0] ? chatRecord.members[1] : chatRecord.members[0]//Need to fix types
+        })
+      })
+    })
+
+    return result;
   }
 
   private async countCursorData(data: FindCursor): Promise<number>{

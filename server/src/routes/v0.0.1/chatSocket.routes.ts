@@ -1,7 +1,7 @@
 import { Application, NextFunction } from "express";
 import { CommonRoutesConfig } from "../../common/common.routes.config";
 import { Server } from "socket.io";
-import { ChatSocketType, CommonRoutesInitData, HttpServer } from "../../models/common.models";
+import { ChatSocketType, CommonRoutesInitData, HttpServer, Logger } from "../../models/common.models";
 import { InvalidTokenError } from "../../utils/errors";
 import { Authenticator } from "../../middlewares/aunthenicator";
 import Jwt from "jsonwebtoken";
@@ -11,11 +11,13 @@ import { databaseManager } from "../../managers/databaseManager";
 import { ChatInitData, ChatRecord, ConversationData } from "../../models/mongose.schema";
 import { Timestamp } from "mongodb";
 import { ChatMiddlewareHandler } from "../../middlewares/chatMiddleware";
+import { getLogger } from "log4js";
 
 export class ChatSockets extends CommonRoutesConfig {
 
   private activeSockets: string[] = [];
   private serverIO!: Server;
+  protected logger!: Logger;
 
   constructor(app: Application, server: HttpServer){
     
@@ -27,6 +29,9 @@ export class ChatSockets extends CommonRoutesConfig {
     if(initData.httpServer !== null){
 
       this.initSocketServer(initData.httpServer);
+    } else {
+
+      this.logger.warn("Server http not provided");
     }
 
     super.init(initData);
@@ -35,8 +40,7 @@ export class ChatSockets extends CommonRoutesConfig {
   private initSocketServer(httpServer: HttpServer): void{
     this.serverIO = new Server(httpServer, {  
       cors: {
-        //@ts-ignore
-        origins: ["http://localhost:5500/dist"]
+        origin: '*'
       }
     });
   }
@@ -99,14 +103,16 @@ export class ChatSockets extends CommonRoutesConfig {
       });
 
       socket.on('disconnect', async() => {
-        socket.broadcast.emit('user-disconnected', socket.userID);
-        chatSessionManager.saveSession(socket.sessionID, {
+
+        const data = {          
           userID: socket.userID,
           userName: socket.userName,
           connected: false
-        });
-      });
+        };
 
+        socket.broadcast.emit('user-disconnected', data);
+        chatSessionManager.saveSession(socket.sessionID, data);
+      });
     });
 
     return this.getApp();

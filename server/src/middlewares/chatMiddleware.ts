@@ -46,4 +46,18 @@ export class ChatMiddlewareHandler {
       console.log('error chat Middleware');
     }
   }   
+
+  public static createSession = async(socket: ChatSocketType, next: NextFunction) => {
+    try {
+      chatSessionManager.saveSession(socket.sessionID, {
+        userID: socket.userID,
+        userName: socket.userName,
+        connected: true
+      });
+
+      next();
+    } catch(err) {
+      console.log(err);
+    }
+  }
 }

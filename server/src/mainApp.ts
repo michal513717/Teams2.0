@@ -11,6 +11,7 @@ import { Debugger } from "./utils/debugger";
 import LoggerHelper from "./utils/logger";
 import * as http from "http";
 import cors from "cors";
+import { ChatSockets } from "./routes/v0.0.1/chatSocket.routes";
 
 export class MainApp {
 
@@ -18,7 +19,7 @@ export class MainApp {
   private application!: Application;
   private routes!: CommonRoutesConfig[];
   private server!: HttpServer;
-  private logger!: Logger;
+  protected logger!: Logger;
 
   constructor() {
     this.init();
