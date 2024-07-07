@@ -1,4 +1,4 @@
-import { chatSessionManager } from "../managers/sessionManager";
+import { chatSessionManager } from "../managers/chatSessionManager";
 import { ChatSocketType, NextFunction } from "../models/common.models";
 import { InvalidTokenError } from "../utils/errors";
 import { Helper } from "../utils/helper";

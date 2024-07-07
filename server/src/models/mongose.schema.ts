@@ -1,11 +1,11 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, Timestamp } from "mongodb";
 import z from "zod";
 
 export type UserDatabaseSchema = {
   _id: ObjectId;
   userName: string;
   password: string;
-  create_at: Date;
+  create_at: Timestamp | Date;
 };
 
 export const ZodLoginUserSchema = z.object({
@@ -21,3 +21,23 @@ export const ZodRegisterUserSchema = z.object({
   message: "Passwords don't match",
   path: ["confirmPassword"]
 });
+
+export type ChatDatabaseSchema = {
+  _id: ObjectId;
+  members: string[];
+  messages: ChatRecord[];
+  total_messages: number;
+};
+
+export type ChatRecord = {
+  sender: string;
+  message: string;
+  timestamp: Timestamp | Date;
+};
+
+export type ChatInitData = {
+  from: string;
+  to: string;
+  message: string;
+};
+export type ConversationData = ChatInitData;

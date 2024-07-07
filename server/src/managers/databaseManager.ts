@@ -1,9 +1,9 @@
-import type { Document } from "mongodb";
-import { Collection, MongoClient } from "mongodb";
+import type { Document, FindCursor } from "mongodb";
+import { Collection, MongoClient, ObjectId, Timestamp } from "mongodb";
 import MongoLocalClient from "../database/index";
 import { DatabaseManagerConfig } from "../utils/configs/databaseManagerConfig";
 import { MongoDatabase } from "../models/common.models";
-import { UserDatabaseSchema } from "../models/mongose.schema";
+import { ChatDatabaseSchema, ConversationData, UserDatabaseSchema } from "../models/mongose.schema";
 
 class DatabaseManager {
 
@@ -43,6 +43,68 @@ class DatabaseManager {
   public async addNewUser(data: UserDatabaseSchema): Promise<void> {
     const collection = await this.getCollection<typeof data>("USERS_COLLECTION");
     await collection.insertOne(data);
+  }
+
+  public async getAllMesseges(userName: string): Promise<ChatDatabaseSchema[]>{
+    const collection = await this.getCollection<ChatDatabaseSchema>("CHAT_COLLECTION");
+    const cursorData = await collection.find({
+      members: [userName]
+    });
+
+    let data = [];
+
+    for await (const doc of cursorData){
+      data.push(doc);
+    }
+
+    return data;
+  }
+
+  public async saveMessage(data: ConversationData): Promise<void>{
+    const collection = await this.getCollection<ChatDatabaseSchema>("CHAT_COLLECTION");
+    const cursorData = await collection.find({
+      members: [data.from, data.to]
+    });
+    const cursorLength = await this.countCursorData(cursorData);
+    
+    if(cursorLength === 0){
+      this.addNewChatRecord(data);
+      return;
+    };
+
+    collection.updateOne({
+      members: [data.from, data.to]
+    }, {
+      $push: {"messages": {
+        sender: data.from,
+        message: data.to,
+        timestamp: new Date()
+      }}
+    });
+  }
+
+  private async addNewChatRecord(data: ConversationData): Promise<void>{
+    const collection = await this.getCollection<ChatDatabaseSchema>("CHAT_COLLECTION");
+    const record: ChatDatabaseSchema = {
+      _id: new ObjectId(),
+      members: [data.from, data.to],
+      messages: [{
+        message: data.message,
+        sender: data.from,
+        timestamp: new Date()
+      }],
+      total_messages: 1
+    };
+
+    await collection.insertOne(record);
+  }
+
+  private async countCursorData(data: FindCursor): Promise<number>{
+    let counter = 0;
+    for await(const doc of data){
+      counter++;
+    }
+    return counter;
   }
 };
 
