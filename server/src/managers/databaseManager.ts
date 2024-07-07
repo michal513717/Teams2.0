@@ -47,8 +47,9 @@ class DatabaseManager {
 
   public async getAllMesseges(userName: string): Promise<ChatDatabaseSchema[]>{
     const collection = await this.getCollection<ChatDatabaseSchema>("CHAT_COLLECTION");
+
     const cursorData = await collection.find({
-      members: [userName]
+      members: { $in: [userName] }
     });
 
     let data = [];
@@ -77,7 +78,7 @@ class DatabaseManager {
     }, {
       $push: {"messages": {
         sender: data.from,
-        message: data.to,
+        message: data.message,
         timestamp: new Date()
       }}
     });

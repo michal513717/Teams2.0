@@ -10,6 +10,7 @@ import { chatSessionManager } from "../../managers/chatSessionManager";
 import { databaseManager } from "../../managers/databaseManager";
 import { ChatInitData, ChatRecord, ConversationData } from "../../models/mongose.schema";
 import { Timestamp } from "mongodb";
+import { ChatMiddlewareHandler } from "../../middlewares/chatMiddleware";
 
 export class ChatSockets extends CommonRoutesConfig {
 
@@ -42,7 +43,7 @@ export class ChatSockets extends CommonRoutesConfig {
 
   configureRoute(): Application {
 
-    this.serverIO.use(Authenticator.verifyTokenSocketMiddleware);
+    this.serverIO.use(ChatMiddlewareHandler.verifyConnection);
 
     this.serverIO.on("connection", async(socket: ChatSocketType) => {
 
@@ -63,17 +64,17 @@ export class ChatSockets extends CommonRoutesConfig {
       let messegesData: ChatInitData[] = [];
 
       chatHistory.forEach((chatRecord) => {
+        console.log(chatHistory)
         chatRecord.messages.forEach((messege) => {
           messegesData.push({
             from: messege.sender,
             message: messege.message,
-            to: messege.sender !== chatRecord.members[0] ? chatRecord.members[1] : chatRecord.members[1]//Need to fix types
+            to: messege.sender === chatRecord.members[0] ? chatRecord.members[1] : chatRecord.members[0]//Need to fix types
           })
         });
       });
       
       socket.emit("init-chats", messegesData);
-
 
       socket.broadcast.emit("user-connected", {
         userID: socket.userID,
@@ -82,15 +83,19 @@ export class ChatSockets extends CommonRoutesConfig {
         messages: [],
       });
 
-      socket.on('private-message', ({ content, to }: any) => {
+      socket.on('private-message', async ({ content, to }: any) => {
+
         const data: ConversationData = {
           to: to,
           message: content,
           from: socket.userName
         };
 
+        const recivedID = chatSessionManager.findSocketIdByUserName(to);
+
         databaseManager.saveMessage(data);
-        socket.to(to).to(socket.userID).emit("private-message", data);
+        
+        socket.to(recivedID).to(socket.userID).emit("private-message", data);
       });
 
       socket.on('disconnect', async() => {

@@ -5,19 +5,28 @@ import { Helper } from "../utils/helper";
 import { Authenticator } from "./aunthenicator";
 
 
-class ChatMiddlewareHandler {
-  public static verifyConnection = (socket: ChatSocketType, next: NextFunction) => {
+export class ChatMiddlewareHandler {
+  public static verifyConnection = async (socket: ChatSocketType, next: NextFunction) => {
     try {
-      const sessionID = socket.handshake.auth.sessionID as string;
-      const userToken = socket.handshake.auth.token as string;
-  
+      let sessionID = socket.handshake.auth.sessionID as string;
+      let userToken = socket.handshake.auth.token as string;
+      
+      //!TMP
+      if(!userToken){
+        userToken = socket.handshake.headers.auth;
+      }
+      
+      if(!sessionID){
+        sessionID = socket.handshake.headers.sessionID;
+      }
+
       if(!userToken){
         return next(new InvalidTokenError());
       }
-  
+      
       if(sessionID){
         const session = chatSessionManager.findSession(sessionID);
-  
+
         if(session !== null) {
           socket.sessionID = sessionID;
           socket.userID = session.userID;
@@ -25,12 +34,12 @@ class ChatMiddlewareHandler {
           next();
         }
       }
-  
-      const userName = Authenticator.verifyTokenSocketMiddleware(socket, next);
+
+      const parsedToken = await Authenticator.verifyTokenSocketMiddleware(socket, next);
       
       socket.sessionID = Helper.getRandomID();
       socket.userID = Helper.getRandomID();
-      socket.userName = userName;
+      socket.userName = parsedToken.userName;
 
       next();
     } catch (error) {

@@ -19,6 +19,18 @@ class ChatSessionManager {
   public findAllSessions(): SessionRecord[] {
     return [...this.sessions.values()];
   }
+
+  public findSocketIdByUserName(userName: string): null | string {
+    const sessions = this.findAllSessions();
+  
+    for(let i = 0; i<sessions.length; i++){
+      if(sessions[i].userName === userName){
+        return sessions[i].userID
+      }
+    }
+
+    return null;
+  }
 }
 
 export const chatSessionManager = new ChatSessionManager();

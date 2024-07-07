@@ -27,11 +27,11 @@ export class Authenticator {
 
   public static verifyTokenSocketMiddleware = async (socket: ChatSocketType, next: any) => {
     let token = socket.handshake.auth.token;
-
+    
     if(!token){
       token = socket.handshake.headers.auth
     }
-
+    
     if (!token) {
       return next(new InvalidTokenError());
     }
