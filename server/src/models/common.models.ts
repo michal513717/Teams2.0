@@ -12,3 +12,10 @@ export type CommonRoutesInitData = {
   version: string
   httpServer: HttpServer | null;
 };
+export type NextFunction = any;
+export type ChatSocketType = any;
+export type SessionRecord = {
+  userID: string;
+  userName: string;
+  connected: boolean;
+}

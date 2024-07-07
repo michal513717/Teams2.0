@@ -8,9 +8,10 @@ export class AuthroizationTokenManager {
     refreshToken: string
   }{
     const payload = {
-      userName,
+      userName: userName,
     };
-    const accessToken = Jwt.sign(payload, SECRET.JWT_SECRET, { expiresIn: "1h" });
+
+    const accessToken = Jwt.sign(payload, SECRET.JWT_SECRET, { expiresIn: "7d" });
     const refreshToken = Jwt.sign(payload, SECRET.JWT_SECRET_REFRESH, {
       expiresIn: "7d",
     });

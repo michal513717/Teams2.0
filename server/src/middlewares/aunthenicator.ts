@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthroizationTokenManager } from '../managers/tokenManager';
+import { ChatSocketType } from '../models/common.models';
+import { InvalidTokenError } from '../utils/errors';
+import { SECRET } from '../utils/configs/secret';
 
 export class Authenticator {
 
@@ -20,5 +23,25 @@ export class Authenticator {
     } catch (error) {
       res.status(401).json(error)
     }
+  }
+
+  public static verifyTokenSocketMiddleware = async (socket: ChatSocketType, next: any) => {
+    let token = socket.handshake.auth.token;
+
+    if(!token){
+      token = socket.handshake.headers.auth
+    }
+
+    if (!token) {
+      return next(new InvalidTokenError());
+    }
+
+    const parsedToken = AuthroizationTokenManager.verifyToken(token);
+
+    if(parsedToken === null){
+      return next(new InvalidTokenError());
+    }
+
+    return parsedToken;
   }
 }
