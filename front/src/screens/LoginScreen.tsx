@@ -29,16 +29,20 @@ const LoginForm: React.FC = () => {
   }, [setUser, navigate]);
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="xs" sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <Box
         sx={{
-          marginTop: 8,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          padding: 3,
+          border: '1px solid #ddd',
+          borderRadius: 1,
+          boxShadow: 3,
+          backgroundColor: 'white',
         }}
       >
-        <Typography component="h1" variant="h5">
+        <Typography component="h1" variant="h5" gutterBottom>
           Login
         </Typography>
         <Form form={loginForm} onSubmit={handleLoginSubmit}>
@@ -68,6 +72,14 @@ const LoginForm: React.FC = () => {
               disabled={loginForm.formState.isSubmitting}
             >
               Login
+            </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              sx={{ mt: 1 }}
+              onClick={() => navigate('/register')}
+            >
+              Register
             </Button>
           </Box>
         </Form>

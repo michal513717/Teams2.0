@@ -15,8 +15,11 @@ const applicationRouter = createBrowserRouter([
     path: "/",
     element: <MainScreen />,
   },
+]);
+
+const authRouter = createBrowserRouter([
   {
-    path: "/login",
+    path: "/",
     element: <LoginScreen />,
   },
   {
@@ -28,13 +31,8 @@ const applicationRouter = createBrowserRouter([
 const App = () => {
   const { user } = useUser();
 
-  return user ? (
-    <RouterProvider router={applicationRouter} />
-  ) : (
-    <RouterProvider router={createBrowserRouter([
-      { path: "/", element: <LoginScreen /> },
-      { path: "/register", element: <RegisterScreen /> }
-    ])} />
+  return (
+    <RouterProvider router={user ? applicationRouter : authRouter} />
   );
 };
 
