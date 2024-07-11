@@ -9,18 +9,20 @@ import MainScreen from './screens/MainScreen';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { UserProvider, useUser } from './context/UserContext';
 import theme from './theme';
+import AuthGuard from './guards/AuthGuard';
 
 const applicationRouter = createBrowserRouter([
   {
-    path: "/",
-    element: <MainScreen />,
+    path: "/chat/:user_chat",
+    element: <AuthGuard component={MainScreen}/>,
   },
-]);
-
-const authRouter = createBrowserRouter([
   {
     path: "/",
-    element: <LoginScreen />,
+    element: <AuthGuard component={MainScreen}/>,
+  },
+  {
+    path: "/login",
+    element: <LoginScreen/>
   },
   {
     path: "/register",
@@ -28,11 +30,10 @@ const authRouter = createBrowserRouter([
   },
 ]);
 
-const App = () => {
-  const { user } = useUser();
 
+const App = () => {
   return (
-    <RouterProvider router={user ? applicationRouter : authRouter} />
+    <RouterProvider router={applicationRouter} />
   );
 };
 

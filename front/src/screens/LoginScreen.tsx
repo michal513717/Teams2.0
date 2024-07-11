@@ -25,11 +25,11 @@ const LoginForm: React.FC = () => {
   const handleLoginSubmit = useCallback((data: any) => {
     console.log('Login Data:', data);
     setUser(data.username);
-    navigate('/');
+    navigate(`/chat/${data.username}`);
   }, [setUser, navigate]);
 
   return (
-    <Container component="main" maxWidth="xs" sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <Container component="main" maxWidth="xs" sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100vw' }}>
       <Box
         sx={{
           display: 'flex',
