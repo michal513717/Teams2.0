@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthroizationTokenManager } from '../managers/tokenManager';
 import { ChatSocketType } from '../models/common.models';
 import { InvalidTokenError } from '../utils/errors';
-import { SECRET } from '../utils/configs/secret';
 
 export class Authenticator {
 

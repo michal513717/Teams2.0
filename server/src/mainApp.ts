@@ -11,7 +11,8 @@ import { Debugger } from "./utils/debugger";
 import LoggerHelper from "./utils/logger";
 import * as http from "http";
 import cors from "cors";
-import { ChatSockets } from "./routes/v0.0.1/chatSocket.routes";
+import { InformationRoute } from "./routes/v0.0.1/information.routes";
+// import { ChatSockets } from "./routes/v0.0.1/chatSocket.routes";
 
 export class MainApp {
 
@@ -70,6 +71,7 @@ export class MainApp {
 
     this.routes.push(new AuthRouter(application));
     this.routes.push(new ExampleRoute(application));
+    this.routes.push(new InformationRoute(application));
     this.routes.push(new SocketRoutes(application, this.server));
     this.routes.push(new NotValidRoutes(application));
   }
