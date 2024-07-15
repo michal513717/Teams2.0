@@ -45,6 +45,21 @@ class DatabaseManager {
     await collection.insertOne(data);
   }
 
+  public async getAllUsers(): Promise<string[]> {
+    
+    const collection = await this.getCollection<UserDatabaseSchema>("USERS_COLLECTION");
+
+    const cursorData = collection.find();
+    
+    let result = [];
+
+    for await (const doc of cursorData){
+      result.push(doc.userName);
+    }
+
+    return result;
+  }
+
   public async getAllMesseges(userName: string): Promise<ChatDatabaseSchema[]>{
     const collection = await this.getCollection<ChatDatabaseSchema>("CHAT_COLLECTION");
 
