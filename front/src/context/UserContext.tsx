@@ -7,6 +7,9 @@ import {
   removeAccessToken,
   removeRefreshToken,
   removeUserName,
+  getUserName,
+  getAccessToken,
+  getRefreshToken,
 } from "@/stores/localStorage";
 
 interface UserContextType {
@@ -19,6 +22,7 @@ interface UserContextType {
   ) => Promise<number>;
   loginUser: (userName: string, password: string) => Promise<number>;
   logoutUser: () => void;
+  authCheck: () => Promise<number>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -78,9 +82,29 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     removeUserName();
   };
 
+  const authCheck = async (): Promise<number> => {
+    try {
+      const userName = getUserName();
+      const accessToken = getAccessToken();
+      const refreshToken = getRefreshToken();
+
+      const response = await axios.get("http://localhost:8080/info/allUsers", {
+        headers: { Authorization: `Bearer: ${accessToken}` },
+      });
+
+      if (response.status == 200) {
+        setUser(userName);
+      }
+
+      return response.status;
+    } catch (error: any) {
+      return 500;
+    }
+  };
+
   return (
     <UserContext.Provider
-      value={{ user, setUser, registerUser, loginUser, logoutUser }}
+      value={{ user, setUser, registerUser, loginUser, logoutUser, authCheck }}
     >
       {children}
     </UserContext.Provider>
