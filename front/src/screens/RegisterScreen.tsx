@@ -15,7 +15,7 @@ const registerSchema = z.object({
 });
 
 const RegisterForm: React.FC = () => {
-  const { setUser } = useUser();
+  const { setUser, registerUser } = useUser();
   const navigate = useNavigate();
 
   const registerForm = useZodForm({
@@ -29,6 +29,7 @@ const RegisterForm: React.FC = () => {
 
   const handleRegisterSubmit = useCallback((data: any) => {
     console.log('Register Data:', data);
+    registerUser(data.username, data.password)
     setUser(data.username);
     navigate('/');
   }, [setUser, navigate]);
