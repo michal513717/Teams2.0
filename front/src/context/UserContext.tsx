@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import axios from 'axios';
+import { setAccessToken, setRefreshToken } from '@/stores/localStorage';
 
 interface UserContextType {
   user: string | null;
   setUser: (user: string | null) => void;
-  registerUser: (username: string, password: string) => number,
-  loginUser: (username: string, password: string) => number,
+  registerUser: (userName: string, password: string, confirmPassword: string) => Promise<number>;
+  loginUser: (userName: string, password: string) => Promise<number>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -12,13 +14,35 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<string | null>(null);
 
-  const registerUser = (username: string, password: string) => {
-    return 200;
-  }
+  const registerUser = async (userName: string, password: string, confirmPassword: string): Promise<number> => {
+    try {
+      const data = { userName, password, confirmPassword };
+      const response = await axios.post('http://localhost:8080/auth/register', data);
+      const { accessToken, refreshToken } = response.data;
+      setAccessToken(accessToken);
+      setRefreshToken(refreshToken);
+      setUser(userName);
+      return response.status;
+    } catch (error: any) {
+      console.error('Registration failed:', error);
+      return error.response?.status || 500;
+    }
+  };
 
-  const loginUser = (username: string, password: string) => {
-    return 200;
-  }
+  const loginUser = async (userName: string, password: string): Promise<number> => {
+    try {
+      const data = { userName, password };
+      const response = await axios.post('http://localhost:8080/auth/login', data);
+      const { accessToken, refreshToken } = response.data;
+      setAccessToken(accessToken);
+      setRefreshToken(refreshToken);
+      setUser(userName);
+      return response.status;
+    } catch (error: any) {
+      console.error('Login failed:', error);
+      return error.response?.status || 500;
+    }
+  };
 
   return (
     <UserContext.Provider value={{ user, setUser, registerUser, loginUser }}>
