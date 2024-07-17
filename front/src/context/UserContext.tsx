@@ -43,11 +43,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         "http://localhost:8080/auth/register",
         data
       );
-      const { accessToken, refreshToken } = response.data;
-      setAccessToken(accessToken);
-      setRefreshToken(refreshToken);
-      setUser(userName);
-      return response.status;
+      const loginStatus = await loginUser(userName, password);
+      return loginStatus;
     } catch (error: any) {
       console.error("Registration failed:", error);
       return error.response?.status || 500;
@@ -64,7 +61,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         "http://localhost:8080/auth/login",
         data
       );
-      const { accessToken, refreshToken } = response.data;
+      const { accessToken, refreshToken } = response.data.result;
       setAccessToken(accessToken);
       setRefreshToken(refreshToken);
       setUserName(userName);
