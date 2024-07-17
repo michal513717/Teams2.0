@@ -8,15 +8,15 @@ import ChatProvider from "@/context/ChatContext";
 import ChatScreen from "./ChatScreen";
 
 const MainScreen: React.FC = () => {
-  const { user, setUser } = useUser();
+  const { user, setUser, logoutUser } = useUser();
   const [messages, setMessages] = useState<string[]>(["Hello!"]);
   const [input, setInput] = useState<string>("");
   const navigate = useNavigate();
   const { user_chat } = useParams();
 
-  const handleLogout = () => {
-    setUser(null);
-    navigate("/");
+  const handleLogout = async () => {
+    logoutUser();
+    navigate("/login");
   };
 
   return (

@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { z } from "zod";
-import { useZodForm, Form, FieldError } from "../utils/form";
+import { useZodForm, Form } from "../utils/form";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
@@ -11,7 +11,7 @@ const loginSchema = z.object({
 });
 
 const LoginForm: React.FC = () => {
-  const { setUser } = useUser();
+  const { loginUser } = useUser();
   const navigate = useNavigate();
 
   const loginForm = useZodForm({
@@ -23,12 +23,16 @@ const LoginForm: React.FC = () => {
   });
 
   const handleLoginSubmit = useCallback(
-    (data: any) => {
+    async (data: any) => {
       console.log("Login Data:", data);
-      setUser(data.username);
-      navigate(`/chat`);
+      const status = await loginUser(data.username, data.password);
+      if (status === 200) {
+        navigate(`/chat`);
+      } else {
+        alert("Login failed. Please check your credentials.");
+      }
     },
-    [setUser, navigate]
+    [loginUser, navigate]
   );
 
   return (

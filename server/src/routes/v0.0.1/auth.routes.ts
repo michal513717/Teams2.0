@@ -1,7 +1,8 @@
 import type { Application } from "express";
 import { CommonRoutesConfig } from "../../common/common.routes.config";
 import express from "express";
-import { loginController, registerController } from "../../controllers/auth.controllers";
+import { loginController, registerController, tokenCheckController } from "../../controllers/auth.controllers";
+import { Authenticator } from "../../middlewares/aunthenicator";
 
 export class AuthRouter extends CommonRoutesConfig {
 
@@ -15,6 +16,7 @@ export class AuthRouter extends CommonRoutesConfig {
 
     authRouter.post('/register', registerController);
     authRouter.post('/login', loginController);
+    authRouter.get('/tokenCheck', Authenticator.verifyTokenMiddleware, tokenCheckController)
 
     this.app.use('/auth', authRouter);
 

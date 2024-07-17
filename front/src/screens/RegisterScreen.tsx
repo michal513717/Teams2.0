@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
 import { z } from 'zod';
-import { useZodForm, Form, FieldError } from '../utils/form';
+import { useZodForm, Form } from '../utils/form';
 import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
 
 const registerSchema = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters long'),
+  userName: z.string().min(3, 'Username must be at least 3 characters long'),
   password: z.string().min(6, 'Password must be at least 6 characters long'),
   confirmPassword: z.string().min(6, 'Confirm Password must be at least 6 characters long'),
 }).refine(data => data.password === data.confirmPassword, {
@@ -21,18 +21,25 @@ const RegisterForm: React.FC = () => {
   const registerForm = useZodForm({
     schema: registerSchema,
     defaultValues: {
-      username: '',
+      userName: '',
       password: '',
       confirmPassword: '',
     },
   });
 
-  const handleRegisterSubmit = useCallback((data: any) => {
-    console.log('Register Data:', data);
-    registerUser(data.username, data.password)
-    setUser(data.username);
-    navigate('/');
-  }, [setUser, navigate]);
+  const handleRegisterSubmit = useCallback(
+    async (data: any) => {
+      console.log('Register Data:', data);
+      const status = await registerUser(data.userName, data.password, data.confirmPassword);
+      if (status === 200) {
+        setUser(data.userName);
+        navigate('/');
+      } else {
+        alert('Registration failed. Please try again.');
+      }
+    },
+    [registerUser, setUser, navigate]
+  );
 
   return (
     <Container component="main" maxWidth="xs" sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -57,9 +64,9 @@ const RegisterForm: React.FC = () => {
               fullWidth
               label="Username"
               margin="normal"
-              {...registerForm.register('username')}
-              error={!!registerForm.formState.errors.username}
-              helperText={registerForm.formState.errors.username?.message}
+              {...registerForm.register('userName')}
+              error={!!registerForm.formState.errors.userName}
+              helperText={registerForm.formState.errors.userName?.message}
             />
             <TextField
               fullWidth
