@@ -85,9 +85,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       const accessToken = getAccessToken();
       const refreshToken = getRefreshToken();
 
-      const response = await axios.get("http://localhost:8080/info/allUsers", {
-        headers: { Authorization: `Bearer: ${accessToken}` },
-      });
+      const response = await axios.get(
+        "http://localhost:8080/auth/tokenCheck",
+        {
+          headers: { Authorization: `Bearer: ${accessToken}` },
+        }
+      );
 
       if (response.status == 200) {
         setUser(userName);

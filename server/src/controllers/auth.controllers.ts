@@ -86,3 +86,15 @@ export const registerController = async (
     internalServerErrorResponse(res);
   }
 };
+
+export const tokenCheckController = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  res.status(200).json({
+    status: CommonRoutesConfig.statusMessage.SUCCESS,
+    message: "Token is valid",
+    result: {}
+  });
+};
