@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { getAccessToken, getUserName } from "@/stores/localStorage";
+import { getAccessToken, getUserName, setSessionID, getSessionID, removeSessionID } from "@/stores/localStorage";
 import { io, Socket } from "socket.io-client";
 
 export interface ChatUser {
@@ -50,6 +50,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
     const accessToken = getAccessToken();
     const userName = getUserName();
+    const storedSessionID = getSessionID();
 
     if (!accessToken || !userName) {
       console.error("Access token or username is missing");
@@ -59,7 +60,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     const newSocket = io("http://localhost:8080", {
       auth: {
         token: accessToken,
-        sessionID: "placeholder", //TODO
+        sessionID: storedSessionID,
       },
     });
 
@@ -69,25 +70,28 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       console.log("Connected to WebSocket server");
     });
 
+    newSocket.on("session", ({ sessionID, userID }) => {
+      setSessionID(sessionID);
+      newSocket.auth = { ...newSocket.auth, sessionID };
+    });
+
     newSocket.on("init-chats", (chatHistory: { from: string; message: string; to: string }[]) => {
-        const formattedMessages = chatHistory.map((msg) => ({
-          from: msg.from,
-          to: msg.to,
-          content: msg.message,
-        }));
-        setMessages(formattedMessages);
-      }
-    );
+      const formattedMessages = chatHistory.map((msg) => ({
+        from: msg.from,
+        to: msg.to,
+        content: msg.message,
+      }));
+      setMessages(formattedMessages);
+    });
 
     newSocket.on("private-message", (message: { from: string; message: string; to: string }) => {
-        const formattedMessage = {
-          from: message.from,
-          to: message.to,
-          content: message.message,
-        };
-        setMessages((prevMessages) => [...prevMessages, formattedMessage]);
-      }
-    );
+      const formattedMessage = {
+        from: message.from,
+        to: message.to,
+        content: message.message,
+      };
+      setMessages((prevMessages) => [...prevMessages, formattedMessage]);
+    });
 
     newSocket.on("user-connected", (userName: string) => {
       setChatUsers((prevUsers) =>
@@ -103,6 +107,10 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
           u.name === userName ? { ...u, status: "offline" } : u
         )
       );
+    });
+
+    newSocket.on("disconnect", () => {
+      removeSessionID();
     });
 
     return () => {
