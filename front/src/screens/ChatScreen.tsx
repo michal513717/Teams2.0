@@ -47,6 +47,7 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
           <div key={index} className={`message-container ${msg.from === user ? 'from' : 'to'}`}>
             <div className="message">
               <div className="message-content">{msg.content}</div>
+              <div className="message-timestamp">{new Date(msg.timestamp).toLocaleString()}</div>
             </div>
           </div>
         ))}

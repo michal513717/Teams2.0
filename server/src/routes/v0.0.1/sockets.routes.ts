@@ -93,7 +93,8 @@ export class SocketRoutes extends CommonRoutesConfig {
       socket.to(recivedID).to(socket.userID).emit("private-message", {
         to: to,
         message: content,
-        from: socket.userName
+        from: socket.userName,
+        timestamp: new Date(),
       });
     });
 
