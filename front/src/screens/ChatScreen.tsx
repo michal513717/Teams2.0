@@ -26,6 +26,14 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
     }
   }, [messages]);
 
+  const filteredMessages = messages.filter(msg => {
+    if (chat_user === user) {
+      return msg.from === user && msg.to === user;
+    } else {
+      return msg.to === chat_user || msg.from === chat_user;
+    }
+  });
+
   return (
     <div className="chat-container">
       <div className="chat-header">
@@ -35,13 +43,13 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
         </Button>
       </div>
       <div className="chat-window">
-        {messages
-          .filter(msg => msg.to === chat_user || msg.from === chat_user)
-          .map((msg, index) => (
-            <div key={index} className={`message-container ${msg.from === user ? 'from' : 'to'}`}>
-              <div className="message">{msg.content}</div>
+        {filteredMessages.map((msg, index) => (
+          <div key={index} className={`message-container ${msg.from === user ? 'from' : 'to'}`}>
+            <div className="message">
+              <div className="message-content">{msg.content}</div>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
       <div className="message-input">
         <input

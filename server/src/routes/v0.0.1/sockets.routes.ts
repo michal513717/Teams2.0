@@ -81,10 +81,14 @@ export class SocketRoutes extends CommonRoutesConfig {
 
       const recivedID = chatSessionManager.findSocketIdByUserName(to);
 
-      databaseManager.saveMessage({
+      const messageData = {
         to: to,
         message: content,
-        from: socket.userName});
+        from: socket.userName,
+        timestamp: new Date(),
+      };
+
+      databaseManager.saveMessage(messageData);
       
       socket.to(recivedID).to(socket.userID).emit("private-message", {
         to: to,

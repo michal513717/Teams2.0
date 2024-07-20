@@ -12,6 +12,7 @@ export interface Message {
   from: string;
   to: string;
   content: string;
+  timestamp: string;
 }
 
 export interface ChatContextType {
@@ -75,22 +76,27 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       newSocket.auth = { ...newSocket.auth, sessionID };
     });
 
-    newSocket.on("init-chats", (chatHistory: { from: string; message: string; to: string }[]) => {
+    newSocket.on("init-chats", (chatHistory: { from: string; message: string; to: string; timestamp: string }[]) => {
       const formattedMessages = chatHistory.map((msg) => ({
         from: msg.from,
         to: msg.to,
         content: msg.message,
+        timestamp: msg.timestamp,
       }));
-      setMessages(formattedMessages);
+      setMessages(formattedMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()));
     });
 
-    newSocket.on("private-message", (message: { from: string; message: string; to: string }) => {
+    newSocket.on("private-message", (message: { from: string; message: string; to: string; timestamp: string }) => {
       const formattedMessage = {
         from: message.from,
         to: message.to,
         content: message.message,
+        timestamp: message.timestamp,
       };
-      setMessages((prevMessages) => [...prevMessages, formattedMessage]);
+      setMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages, formattedMessage];
+        return updatedMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      });
     });
 
     newSocket.on("user-connected", (userName: string) => {
@@ -122,11 +128,12 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     if (socket) {
       const userName = getUserName();
       if (userName) {
-        socket.emit("private-message", { content: message, to });
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { from: userName, to, content: message },
-        ]);
+        const timestamp = new Date().toISOString();
+        socket.emit("private-message", { content: message, to, timestamp });
+        setMessages((prevMessages) => {
+          const updatedMessages = [...prevMessages, { from: userName, to, content: message, timestamp }];
+          return updatedMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+        });
       } else {
         console.error("User name is null");
       }

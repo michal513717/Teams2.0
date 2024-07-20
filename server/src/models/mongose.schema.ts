@@ -39,5 +39,7 @@ export type ChatInitData = {
   from: string;
   to: string;
   message: string;
+  timestamp: Date;
 };
+
 export type ConversationData = ChatInitData;
