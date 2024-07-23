@@ -11,6 +11,7 @@ import {
   getAccessToken,
   getRefreshToken,
 } from "@/stores/localStorage";
+import { CONFIG } from "@/utils/config";
 
 interface UserContextType {
   user: string | null;
@@ -40,7 +41,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const data = { userName, password, confirmPassword };
       const response = await axios.post(
-        "http://localhost:8080/auth/register",
+        CONFIG.SERVER_URL + CONFIG.END_POINTS.REGISTER_ROUTE,
         data
       );
       const loginStatus = await loginUser(userName, password);
@@ -58,7 +59,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     try {
       const data = { userName, password };
       const response = await axios.post(
-        "http://localhost:8080/auth/login",
+        CONFIG.SERVER_URL + CONFIG.END_POINTS.LOGIN_ROUTE,
         data
       );
       const { accessToken, refreshToken } = response.data.result;
@@ -84,9 +85,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       const userName = getUserName();
       const accessToken = getAccessToken();
       const refreshToken = getRefreshToken();
-
       const response = await axios.get(
-        "http://localhost:8080/auth/tokenCheck",
+        CONFIG.SERVER_URL + CONFIG.END_POINTS.CHECK_TOKEN,
         {
           headers: { Authorization: `Bearer: ${accessToken}` },
         }

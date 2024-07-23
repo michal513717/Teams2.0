@@ -3,6 +3,7 @@ import axios from "axios";
 import { getAccessToken, getUserName, setSessionID, getSessionID, removeSessionID } from "@/stores/localStorage";
 import { io, Socket } from "socket.io-client";
 
+
 export interface ChatUser {
   name: string;
   status: "online" | "offline";
@@ -18,6 +19,12 @@ export interface Message {
   to: string;
   content: string;
   timestamp: string;
+}
+
+export type ChatHistory = {
+  time: Date;
+  message: string;
+  sender: string;
 }
 
 export interface ChatContextType {
@@ -160,6 +167,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       {children}
     </ChatContext.Provider>
   );
+
 };
 
 export default ChatProvider;
