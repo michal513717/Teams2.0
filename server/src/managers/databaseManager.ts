@@ -94,7 +94,7 @@ class DatabaseManager {
       $push: {"messages": {
         sender: data.from,
         message: data.message,
-        timestamp: new Date()
+        timestamp: data.timestamp,
       }}
     });
   }
@@ -129,10 +129,12 @@ class DatabaseManager {
 
     chatHistory.forEach((chatRecord) => {
       chatRecord.messages.forEach((message) => {
+        const timestamp = message.timestamp instanceof Date ? message.timestamp : new Date(message.timestamp.getHighBits() * 1000 + message.timestamp.getLowBits() / 1000000);
         result.push({
           from: message.sender,
           message: message.message,
-          to: message.sender === chatRecord.members[0] ? chatRecord.members[1] : chatRecord.members[0]//Need to fix types
+          to: message.sender === chatRecord.members[0] ? chatRecord.members[1] : chatRecord.members[0], //Need to fix types
+          timestamp: timestamp,
         })
       })
     })

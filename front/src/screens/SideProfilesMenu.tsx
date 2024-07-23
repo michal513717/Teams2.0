@@ -3,18 +3,20 @@ import "./Screen.css";
 import { useContext, useEffect } from "react";
 import { ChatContext, ChatContextType, ChatUser } from "@/context/ChatContext";
 import { useNavigate } from "react-router-dom";
+import { getUserName } from "@/stores/localStorage";
 
 type Props = { chat_user: string | undefined };
 
 const SideProfilesMenu: React.FC<Props> = ({ chat_user }) => {
   const { chatUsers } = useContext(ChatContext) as ChatContextType;
   const navigate = useNavigate();
+  const userName = getUserName();
 
   useEffect(() => {
     if (!chat_user && chatUsers.length > 0) {
       navigate(`/chat/${chatUsers[0].name}`);
     }
-  });
+  }, [chat_user, chatUsers, navigate]);
 
   return (
     <Container className="players">
@@ -36,7 +38,7 @@ const SideProfilesMenu: React.FC<Props> = ({ chat_user }) => {
                 user.status == "online" ? "status online" : "status offline"
               }
             ></span>{" "}
-            {user.name}
+            {user.name} {user.name === userName ? "(you)" : ""}
           </div>
         ))}
       </>

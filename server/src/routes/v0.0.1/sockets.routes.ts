@@ -70,9 +70,12 @@ export class SocketRoutes extends CommonRoutesConfig {
 
     socket.emit("init-chats", await databaseManager.getUserChatHistory(socket.userName));
 
+    const allSessions = chatSessionManager.findAllSessions();
+    socket.emit("all-users", allSessions);
+
     socket.broadcast.emit("user-connected", {
       userID: socket.userID,
-      username: socket.username,
+      userName: socket.userName,
       connected: true,
       messages: [],
     });
@@ -81,20 +84,25 @@ export class SocketRoutes extends CommonRoutesConfig {
 
       const recivedID = chatSessionManager.findSocketIdByUserName(to);
 
-      databaseManager.saveMessage({
+      const messageData = {
         to: to,
         message: content,
-        from: socket.userName});
+        from: socket.userName,
+        timestamp: new Date(),
+      };
+
+      databaseManager.saveMessage(messageData);
       
       socket.to(recivedID).to(socket.userID).emit("private-message", {
         to: to,
         message: content,
-        from: socket.userName
+        from: socket.userName,
+        timestamp: new Date(),
       });
     });
 
     socket.on('disconnect', async() => {
-      socket.broadcast.emit('user-disconnected', socket.userID);
+      socket.broadcast.emit('user-disconnected', socket.userName);
       chatSessionManager.saveSession(socket.sessionID, {
         userID: socket.userID,
         userName: socket.userName,

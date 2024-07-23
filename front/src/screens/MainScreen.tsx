@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./Screen.css";
-import { useUser } from "../context/UserContext";
-import { Button, Grid } from "@mui/material";
+import { useUser } from "@/context/UserContext";
+import { Button } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import SideProfilesMenu from "./SideProfilesMenu";
 import ChatProvider from "@/context/ChatContext";
 import ChatScreen from "./ChatScreen";
 
 const MainScreen: React.FC = () => {
-  const { user, setUser, logoutUser } = useUser();
-  const [messages, setMessages] = useState<string[]>(["Hello!"]);
-  const [input, setInput] = useState<string>("");
+  const { logoutUser } = useUser();
   const navigate = useNavigate();
   const { user_chat } = useParams();
 
@@ -28,7 +26,7 @@ const MainScreen: React.FC = () => {
             Logout
           </Button>
         </div>
-        <ChatScreen chat_user={user_chat}></ChatScreen>
+        <ChatScreen chat_user={user_chat} />
       </div>
     </ChatProvider>
   );
