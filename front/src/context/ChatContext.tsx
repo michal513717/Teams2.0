@@ -8,6 +8,11 @@ export interface ChatUser {
   status: "online" | "offline";
 }
 
+interface UserStatus {
+  userName: string;
+  connected: boolean;
+}
+
 export interface Message {
   from: string;
   to: string;
@@ -99,19 +104,29 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       });
     });
 
-    newSocket.on("user-connected", (userName: string) => {
+    newSocket.on("all-users", (allUsers: UserStatus[]) => {
       setChatUsers((prevUsers) =>
-        prevUsers.map((u) =>
-          u.name === userName ? { ...u, status: "online" } : u
-        )
+      prevUsers.map((u) => {
+        const user = allUsers.find((user) => user.userName === u.name);
+        return user ? { ...u, status: user.connected ? "online" : "offline" } : u;
+      })
+    );
+  });
+
+    newSocket.on("user-connected", (user) => {
+      const userName = user.userName;
+      setChatUsers((prevUsers) =>
+        prevUsers.map((u) => {
+          return u.name === userName ? { ...u, status: "online" } : u;
+        })
       );
     });
 
-    newSocket.on("user-disconnected", (userName: string) => {
+    newSocket.on("user-disconnected", (userName) => {
       setChatUsers((prevUsers) =>
-        prevUsers.map((u) =>
-          u.name === userName ? { ...u, status: "offline" } : u
-        )
+        prevUsers.map((u) => {
+          return u.name === userName ? { ...u, status: "offline" } : u;
+        })
       );
     });
 
