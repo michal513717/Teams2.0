@@ -49,7 +49,7 @@ export class MainApp {
   private initApplicationAndServer(): void {
 
     this.application = express();
-    this.application.use(cors());
+    this.application.use(cors(this.config.CORS_CONFIG));
     this.application.use(express.json());
 
     this.server = http.createServer(this.application);
