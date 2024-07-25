@@ -98,10 +98,11 @@
 }
 
 .message-container.from {
-  align-items: flex-start;
-}
-.message-container.to {
   align-items: flex-end;
+}
+
+.message-container.to {
+  align-items: flex-start;
 }
 
 .message-input {
@@ -130,4 +131,20 @@
 
 .message-input button:disabled {
   background-color: #ccc;
+}
+
+.video-chat-container {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-container {
+  display: flex;
+  flex: 1;
+}
+
+.video {
+  width: 50%;
+  height: auto;
 }

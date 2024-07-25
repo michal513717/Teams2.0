@@ -99,7 +99,7 @@ const RegisterForm: React.FC = () => {
               fullWidth
               variant="outlined"
               sx={{ mt: 1 }}
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/login')}
             >
               Back to Login
             </Button>

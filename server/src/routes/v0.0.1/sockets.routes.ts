@@ -51,11 +51,29 @@ export class SocketRoutes extends CommonRoutesConfig {
   }
 
   private configureWebRTCConnection = (socket: Socket) => {
+    socket.on("make-offer", (data) => {
+      socket.to(data.to).emit("offer-made", {
+        socket: socket.id,
+        offer: data.offer
+      });
+    });
+
     socket.on("make-answer", (data) => {
       socket.to(data.to).emit("answer-made", {
         socket: socket.id,
         answer: data.answer
       });
+    });
+
+    socket.on("ice-candidate", (data) => {
+      socket.to(data.to).emit("ice-candidate", {
+        candidate: data.candidate,
+        socket: socket.id
+      });
+    });
+
+    socket.on('disconnect', () => {
+      socket.broadcast.emit('user-disconnected', socket.id);
     });
   }
 

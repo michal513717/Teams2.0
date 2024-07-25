@@ -3,7 +3,6 @@ import axios from "axios";
 import { getAccessToken, getUserName, setSessionID, getSessionID, removeSessionID } from "@/stores/localStorage";
 import { io, Socket } from "socket.io-client";
 
-
 export interface ChatUser {
   name: string;
   status: "online" | "offline";
@@ -34,6 +33,8 @@ export interface ChatContextType {
 }
 
 export const ChatContext = createContext<ChatContextType | null>(null);
+
+let globalSocket: Socket | null = null; // Global variable for socket
 
 const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
@@ -78,6 +79,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     });
 
     setSocket(newSocket);
+    globalSocket = newSocket;
 
     newSocket.on("connect", () => {
       console.log("Connected to WebSocket server");
@@ -179,3 +181,5 @@ export const useChat = () => {
   }
   return context;
 };
+
+export { globalSocket };
