@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
 import { z } from 'zod';
 import { useZodForm, Form } from '../utils/form';
-import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { useRegister } from '@/hooks/useRegister';
+import { useAuthStore } from '@/stores/authStorage';
 
 const registerSchema = z.object({
   userName: z.string().min(3, 'Username must be at least 3 characters long'),
@@ -15,7 +16,8 @@ const registerSchema = z.object({
 });
 
 const RegisterForm: React.FC = () => {
-  const { setUser, registerUser } = useUser();
+  const { setIsAuthenticated, setUserName } = useAuthStore();
+  const { registerUser } = useRegister();
   const navigate = useNavigate();
 
   const registerForm = useZodForm({
@@ -32,13 +34,13 @@ const RegisterForm: React.FC = () => {
       console.log('Register Data:', data);
       const status = await registerUser(data.userName, data.password, data.confirmPassword);
       if (status === 200) {
-        setUser(data.userName);
-        navigate('/');
+        setUserName(data.userName);
+        setIsAuthenticated(true);
       } else {
         alert('Registration failed. Please try again.');
       }
     },
-    [registerUser, setUser, navigate]
+    [registerForm]
   );
 
   return (

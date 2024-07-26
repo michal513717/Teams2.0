@@ -36,18 +36,6 @@ export function getSessionKey(): string | null {
   return localStorage.getItem(SESSION_STORAGE_KEY);
 }
 
-export function setUserName(name: string): void {
-  localStorage.setItem(USER_NAME, name);
-}
-
-export function getUserName(): string | null {
-  return localStorage.getItem(USER_NAME);
-}
-
-export function removeUserName(): void {
-  localStorage.removeItem(USER_NAME);
-}
-
 export function getSessionID(): string | null {
   return localStorage.getItem(SESSION_ID_STORAGE_KEY);
 }

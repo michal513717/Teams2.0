@@ -1,24 +1,21 @@
 import React from "react";
 import "./Screen.css";
-import { useUser } from "@/context/UserContext";
 import { Button } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import SideProfilesMenu from "./SideProfilesMenu";
-import ChatProvider from "@/context/ChatContext";
+// import ChatProvider from "@/context/ChatContext";
 import ChatScreen from "./ChatScreen";
+import { useLogin } from "@/hooks/useLogin";
 
 const MainScreen: React.FC = () => {
-  const { logoutUser } = useUser();
-  const navigate = useNavigate();
+  const { logoutUser } = useLogin();
   const { user_chat } = useParams();
 
   const handleLogout = async () => {
     logoutUser();
-    navigate("/login");
   };
 
   return (
-    <ChatProvider>
       <div className="main-screen">
         <div className="sidebar">
           <SideProfilesMenu chat_user={user_chat} />
@@ -28,7 +25,6 @@ const MainScreen: React.FC = () => {
         </div>
         <ChatScreen chat_user={user_chat} />
       </div>
-    </ChatProvider>
   );
 };
 

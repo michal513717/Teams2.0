@@ -92,9 +92,16 @@ export const tokenCheckController = (
   res: Response,
   next: NextFunction
 ) => {
+
+  const authHeader = req.headers.authorization;
+  const token = authHeader!.split(' ')[1];
+  const payload = AuthroizationTokenManager.verifyToken(token);
+
   res.status(200).json({
     status: CommonRoutesConfig.statusMessage.SUCCESS,
     message: "Token is valid",
-    result: {}
+    result: { 
+      userName: payload!.userName
+    }
   });
 };

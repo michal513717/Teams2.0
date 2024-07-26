@@ -1,22 +1,25 @@
 import Container from "@mui/material/Container";
 import "./Screen.css";
 import { useContext, useEffect } from "react";
-import { ChatContext, ChatContextType, ChatUser } from "@/context/ChatContext";
+// import { ChatContext, ChatContextType, ChatUser } from "@/context/ChatContext";
 import { useNavigate } from "react-router-dom";
-import { getUserName } from "@/stores/localStorage";
+import { useAuthStore } from "@/stores/authStorage";
+import { useChatStorage } from "@/stores/chatStorage";
+import { useChat } from "@/hooks/useChat";
+import { ChatUser } from "@/type/common.types";
 
 type Props = { chat_user: string | undefined };
 
 const SideProfilesMenu: React.FC<Props> = ({ chat_user }) => {
-  const { chatUsers } = useContext(ChatContext) as ChatContextType;
-  const navigate = useNavigate();
-  const userName = getUserName();
+  const { userName } = useAuthStore();
+  const { fetchUsers } = useChat();
+  const { chatUsers } = useChatStorage();
 
   useEffect(() => {
-    if (!chat_user && chatUsers.length > 0) {
-      navigate(`/chat/${chatUsers[0].name}`);
+    if(chatUsers.length === 0){
+      fetchUsers();
     }
-  }, [chat_user, chatUsers, navigate]);
+  }, [chatUsers]);
 
   return (
     <Container className="players">
@@ -25,13 +28,13 @@ const SideProfilesMenu: React.FC<Props> = ({ chat_user }) => {
           <div
             key={user.name}
             className={user.name == chat_user ? "player clicked" : "player"}
-            onClick={
-              user.name == chat_user
-                ? () => {}
-                : () => {
-                    navigate(`/chat/${user.name}`);
-                  }
-            }
+            // onClick={
+            //   user.name == chat_user
+            //     ? () => {}
+            //     : () => {
+            //         navigate(`/chat/${user.name}`);
+            //       }
+            // }
           >
             <span
               className={
