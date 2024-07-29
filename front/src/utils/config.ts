@@ -22,8 +22,9 @@ export const CONFIG = {
     RECIVE_WEBRTC_SETTINS: 'answer-made',
     SESSION_INFO: 'session',
     INIT_CHATS: 'init-chats',
-    RECIVE_PRIVATE_MESSAGE: 'private-message',
+    PRIVATE_MESSAGE: 'private-message',
     USER_CONNECTED: 'user-connected',
+    ALL_USERS: 'all-users',
     USER_DISCONNECT: 'user-disconnected'
   }
 }
