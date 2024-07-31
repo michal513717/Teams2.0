@@ -4,6 +4,7 @@ import { io, Socket } from "socket.io-client";
 import { getSessionID, getAccessToken, setSessionID } from "@/stores/localStorage";
 import { useChatStorage } from "@/stores/chatStorage";
 import { UserStatus } from "@/type/common.types";
+import { peerConnection } from "@/utils/globals";
 import { useAuthStore } from "@/stores/authStorage";
 
 export const useSocket = () => {
@@ -89,6 +90,31 @@ export const useSocket = () => {
     socket.on(CONFIG.SOCKET_LISTENERS.USER_DISCONNECT, (user) => {
       toogleUserStatus(user);
     });
+
+    socket.on(CONFIG.SOCKET_LISTENERS.CALL_MADE, async data => {
+
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
+      
+      socket.emit(CONFIG.SOCKET_EVENTS.CONNECT_WEBRTC, {
+        answer,
+        to: data.socket
+      });
+     });
+
+
+     //TODO Make video container
+     socket.on(CONFIG.SOCKET_LISTENERS.RECIVE_WEBRTC_SETTINS, async data => {
+      await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.answer)
+      );
+      
+      // if (!isAlreadyCalling) {
+      //   callUser(data.socket);
+      //   isAlreadyCalling = true;
+      // }
+     });
 
   }, [socket])
 

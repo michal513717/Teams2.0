@@ -6,6 +6,7 @@ import ChatScreen from "./ChatScreen";
 import React from "react";
 import "./Screen.css";
 import { SidePanelMenu } from "@/components/SidePanelMenu";
+import { UserTopPanelActivity } from "@/components/UserTopPanelActivity";
 
 const MainScreen: React.FC = () => {
   const { logoutUser } = useLogin();
@@ -18,6 +19,7 @@ const MainScreen: React.FC = () => {
   return (
     <Box width={1} height={1}>
       <SidePanelMenu/>
+      <UserTopPanelActivity/>
     </Box>
   );
 };
