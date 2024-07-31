@@ -1,30 +1,27 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 interface UserCardProps {
   isActive: boolean;
   userName: string;
 }
 
-function UserCard({isActive, userName}: UserCardProps) {
+function UserCard({ isActive, userName }: UserCardProps) {
+
+  const hasNewMessages = Math.random() > 0.5 ;
+
   return (
-    <Box padding={10} >
-    <Box display={'inline-block'}>
-      <div>
-        {userName}
+
+    <div className={`user ${hasNewMessages ? "selected" : ''}`}>
+      <div className="description">
+        <div className="name">
+          {userName}
+        </div>
+        <div className="status">
+          <i className={`icon ${hasNewMessages ? 'icon-connected user.connected' : ''}`} /> { hasNewMessages ? "online" : "offline" }
+        </div>
       </div>
-      <Box color={'#92959e'}>
-        <p> {isActive} </p>
-      </Box>
-    </Box>
-    <Box 
-      color={'white'}
-      bgcolor={'red'}
-      width={20}
-      borderRadius={5}
-      textAlign={'center'}
-      marginTop={10}
-    >!</Box>
-    </Box>
+      {/* <div className={`${hasNewMessages} ? "new-messages" : ""`}>!</div> */}
+    </div>
   )
 }
 

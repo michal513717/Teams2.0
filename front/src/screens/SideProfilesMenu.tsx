@@ -6,11 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStorage";
 import { useChatStorage } from "@/stores/chatStorage";
 import { useChat } from "@/hooks/useChat";
-import { ChatUser } from "@/type/common.types";
+import { ChatUser, UserStatus } from "@/type/common.types";
 
 type Props = { chat_user: string | undefined };
 
 const SideProfilesMenu: React.FC<Props> = ({ chat_user }) => {
+  const navigate = useNavigate();
   const { userName } = useAuthStore();
   const { fetchUsers } = useChat();
   const { chatUsers } = useChatStorage();
@@ -24,24 +25,25 @@ const SideProfilesMenu: React.FC<Props> = ({ chat_user }) => {
   return (
     <Container className="players">
       <>
-        {chatUsers.map((user: ChatUser) => (
+        {
+        chatUsers.map((user: UserStatus) => (
           <div
-            key={user.name}
-            className={user.name == chat_user ? "player clicked" : "player"}
-            // onClick={
-            //   user.name == chat_user
-            //     ? () => {}
-            //     : () => {
-            //         navigate(`/chat/${user.name}`);
-            //       }
-            // }
+            key={user.userName}
+            className={user.userName === chat_user ? "player clicked" : "player"}
+            onClick={
+              user.userName === chat_user ?
+              () => {}
+              : () => {
+                navigate(`/chat/${user.userName}`)
+              }
+            }
           >
             <span
               className={
-                user.status == "online" ? "status online" : "status offline"
+                user.connected === true ? "status online" : "status offline"
               }
             ></span>{" "}
-            {user.name} {user.name === userName ? "(you)" : ""}
+            {user.userName} {user.userName === userName ? "(you)" : ""}
           </div>
         ))}
       </>

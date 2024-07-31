@@ -4,9 +4,10 @@ import { io, Socket } from "socket.io-client";
 import { getSessionID, getAccessToken, setSessionID } from "@/stores/localStorage";
 import { useChatStorage } from "@/stores/chatStorage";
 import { UserStatus } from "@/type/common.types";
+import { useAuthStore } from "@/stores/authStorage";
 
 export const useSocket = () => {
-
+  const { userName } = useAuthStore();
   const { 
     socket, 
     setSocket, 
@@ -91,4 +92,19 @@ export const useSocket = () => {
 
   }, [socket])
 
+  const sendMessage = (message: string, to: string) => {
+    if(socket === null || userName === null) return;
+    
+    const formattedMessage = {
+      from: userName, 
+      to, 
+      content: message, 
+      timestamp: new Date().toISOString()
+    };
+
+    setMessagesWithFormat(formattedMessage);
+  };
+
+
+  return { sendMessage };
 }

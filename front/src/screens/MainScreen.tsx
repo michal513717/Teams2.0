@@ -1,11 +1,11 @@
+import SideProfilesMenu from "./SideProfilesMenu";
+import { useParams } from "react-router-dom";
+import { useLogin } from "@/hooks/useLogin";
+import { Box, Button } from "@mui/material";
+import ChatScreen from "./ChatScreen";
 import React from "react";
 import "./Screen.css";
-import { Button } from "@mui/material";
-import { useParams } from "react-router-dom";
-import SideProfilesMenu from "./SideProfilesMenu";
-// import ChatProvider from "@/context/ChatContext";
-import ChatScreen from "./ChatScreen";
-import { useLogin } from "@/hooks/useLogin";
+import { SidePanelMenu } from "@/components/SidePanelMenu";
 
 const MainScreen: React.FC = () => {
   const { logoutUser } = useLogin();
@@ -16,15 +16,9 @@ const MainScreen: React.FC = () => {
   };
 
   return (
-      <div className="main-screen">
-        <div className="sidebar">
-          <SideProfilesMenu chat_user={user_chat} />
-          <Button variant="contained" color="secondary" onClick={handleLogout}>
-            Logout
-          </Button>
-        </div>
-        <ChatScreen chat_user={user_chat} />
-      </div>
+    <Box width={1} height={1}>
+      <SidePanelMenu/>
+    </Box>
   );
 };
 

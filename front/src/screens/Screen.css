@@ -1,3 +1,9 @@
+body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
 #root {
   width: 100vw;
   height: 100vh;
@@ -41,15 +47,6 @@
 .player.clicked {
   background-color: #CC92C2;
   cursor: default;
-}
-
-
-.status {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 10px;
 }
 
 .online {

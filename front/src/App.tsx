@@ -24,11 +24,11 @@ const App: React.FC = () => {
     return <p>loading</p>;
   }
   return (
-    <div style={{ flex: 1 }}>
+    <>
       <Suspense fallback={<p>loading</p>}>
         <RouterProvider router={isAuthenticated ? mainRouter : authRouter} />
       </Suspense>
-    </div>
+    </>
   );
 }
 

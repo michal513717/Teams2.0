@@ -1,10 +1,10 @@
-import React, { useCallback } from 'react';
-import { z } from 'zod';
+import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { useAuthStore } from '@/stores/authStorage';
+import { useRegister } from '@/hooks/useRegister';
 import { useZodForm, Form } from '../utils/form';
 import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
-import { useRegister } from '@/hooks/useRegister';
-import { useAuthStore } from '@/stores/authStorage';
+import React, { useCallback } from 'react';
+import { z } from 'zod';
 
 const registerSchema = z.object({
   userName: z.string().min(3, 'Username must be at least 3 characters long'),
