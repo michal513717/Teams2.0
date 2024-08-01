@@ -6,6 +6,8 @@ export const useChatStorage = create<ChatStore>((set) => ({
   messages: null,
   chatUsers: [],
   socket: null,
+  selectedUserChat: null,
+  setSelectedUserChat: (value) => set({ selectedUserChat: value }),
   setChatUsers: (value) => set({ chatUsers: value }),
   setMessages: (value) => set({ messages: value }),
   setSocket: (value) => set({ socket: value }),
@@ -20,7 +22,7 @@ export const useChatStorage = create<ChatStore>((set) => ({
       return {
         ...state
       }
-    }),
+  }),
   setMessagesWithFormat: (value) => 
     set((state) => {
       let prevMessages = state.messages || [];
@@ -47,5 +49,5 @@ export const useChatStorage = create<ChatStore>((set) => ({
         ...state,
         chatUsers: newStatus
       }
-    }),
+  }),
 }))

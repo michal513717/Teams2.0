@@ -12,6 +12,8 @@ export type ChatStore = {
   chatUsers: UserStatus[];
   messages: Message[] | null;
   socket: Socket | null;
+  selectedUserChat: string | null;
+  setSelectedUserChat: (value: string) => void;
   setChatUsers: (value: UserStatus[]) => void;
   setMessages: (value: Message[] | null) => void;
   setSocket: (value: Socket | null) => void;
@@ -20,3 +22,7 @@ export type ChatStore = {
   toogleUserStatus: (userName: string) => void;
 };
 
+export type VideoStore = {
+  isModalOpen: boolean;
+  setIsModalOpen: (value: boolean) => void;
+}

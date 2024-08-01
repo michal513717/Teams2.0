@@ -7,6 +7,7 @@ import React from "react";
 import "./Screen.css";
 import { SidePanelMenu } from "@/components/SidePanelMenu";
 import { UserTopPanelActivity } from "@/components/UserTopPanelActivity";
+import { VideoModal } from "@/components/VideoModal";
 
 const MainScreen: React.FC = () => {
   const { logoutUser } = useLogin();
@@ -20,6 +21,7 @@ const MainScreen: React.FC = () => {
     <Box width={1} height={1}>
       <SidePanelMenu/>
       <UserTopPanelActivity/>
+      <VideoModal/>
     </Box>
   );
 };
