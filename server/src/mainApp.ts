@@ -1,3 +1,4 @@
+import bodyParser from "body-parser";
 import { APPLICATION_CONFIG } from "./utils/configs/applicationConfig";
 import { CommonRoutesConfig } from "./common/common.routes.config";
 import { NotValidRoutes } from "./routes/v0.0.1/notValid.routes";
@@ -12,6 +13,7 @@ import LoggerHelper from "./utils/logger";
 import * as http from "http";
 import cors from "cors";
 import { InformationRoute } from "./routes/v0.0.1/information.routes";
+import cacheControl from "express-cache-controller";
 // import { ChatSockets } from "./routes/v0.0.1/chatSocket.routes";
 
 export class MainApp {
@@ -49,10 +51,15 @@ export class MainApp {
   private initApplicationAndServer(): void {
 
     this.application = express();
-    this.application.use(cors(this.config.CORS_CONFIG));
+    // this.application.use(cors(this.config.CORS_CONFIG));
+    this.application.use(cacheControl({ noCache: true }));
+    this.application.use(cors({ origin: '*' }));
     this.application.use(express.json());
 
     this.server = http.createServer(this.application);
+
+    this.application.use(bodyParser.urlencoded({ extended: true }));
+
   }
 
   private initBasicDebug(): void {

@@ -5,20 +5,21 @@ import { chatSessionManager } from "../../managers/chatSessionManager";
 import { databaseManager } from "../../managers/databaseManager";
 import { Application } from "express";
 import { Server, Socket } from "socket.io";
+import { APPLICATION_CONFIG } from "../../utils/configs/applicationConfig";
 
 
 export class SocketRoutes extends CommonRoutesConfig {
 
   private serverIO!: Server;
 
-  constructor(app: Application, server: HttpServer){
-    
+  constructor(app: Application, server: HttpServer) {
+
     super(app, "Sockets routes", "0.0.1", server);
   }
 
   protected init(initData: CommonRoutesInitData): void {
 
-    if(initData.httpServer !== null){
+    if (initData.httpServer !== null) {
 
       this.initSocketServer(initData.httpServer);
     }
@@ -26,15 +27,17 @@ export class SocketRoutes extends CommonRoutesConfig {
     super.init(initData);
   }
 
-  private initSocketServer(httpServer: HttpServer): void{
-    this.serverIO = new Server(httpServer, {  
+  private initSocketServer(httpServer: HttpServer): void {
+    this.serverIO = new Server(httpServer, {
       cors: {
-        origin: '*'
+        methods: ["GET", "POST"],
+        credentials: true,
+        origin: APPLICATION_CONFIG.CORS_CONFIG.origin,
       }
     });
   }
 
-  configureRoute(): Application {
+  public configureRoute(): Application {
 
     this.serverIO.use(ChatMiddlewareHandler.verifyConnection);
 
@@ -53,14 +56,20 @@ export class SocketRoutes extends CommonRoutesConfig {
   private configureWebRTCConnection = (socket: Socket) => {
 
     socket.on("call-user", data => {
-      socket.to(data.to).emit("call-made", {
+
+      const recivedID = chatSessionManager.findSocketIdByUserName(data.to) as string;
+
+      socket.to(recivedID).emit("call-made", {
         offer: data.offer,
         socket: socket.id
       });
     });
 
     socket.on("make-answer", (data) => {
-      socket.to(data.to).emit("answer-made", {
+
+      const recivedID = chatSessionManager.findSocketIdByUserName(data.to) as string;
+
+      socket.to(recivedID).emit("answer-made", {
         socket: socket.id,
         answer: data.answer
       });
@@ -68,7 +77,7 @@ export class SocketRoutes extends CommonRoutesConfig {
   }
 
   private configureChatConnection = async (socket: Socket & any) => {
-    
+
     socket.emit("session", {
       sessionID: socket.sessionID,
       userID: socket.userID
@@ -79,6 +88,7 @@ export class SocketRoutes extends CommonRoutesConfig {
     socket.emit("init-chats", await databaseManager.getUserChatHistory(socket.userName));
 
     const allSessions = chatSessionManager.findAllSessions();
+
     socket.emit("all-users", allSessions);
 
     socket.broadcast.emit("user-connected", {
@@ -100,7 +110,7 @@ export class SocketRoutes extends CommonRoutesConfig {
       };
 
       databaseManager.saveMessage(messageData);
-      
+
       socket.to(recivedID).to(socket.userID).emit("private-message", {
         to: to,
         message: content,
@@ -109,13 +119,9 @@ export class SocketRoutes extends CommonRoutesConfig {
       });
     });
 
-    socket.on('disconnect', async() => {
+    socket.on('disconnect', async () => {
       socket.broadcast.emit('user-disconnected', socket.userName);
-      chatSessionManager.saveSession(socket.sessionID, {
-        userID: socket.userID,
-        userName: socket.userName,
-        connected: false
-      });
+      chatSessionManager.removeSession(socket.socketId);
     });
   }
 }
