@@ -1,7 +1,7 @@
 import { SessionRecord } from "../models/common.models";
 
 
-class ChatSessionManager {
+export class ChatSessionManager {
   private sessions: Map<string, SessionRecord>;
 
   constructor() {

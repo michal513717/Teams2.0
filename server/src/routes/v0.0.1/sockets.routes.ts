@@ -1,16 +1,19 @@
 import { CommonRoutesInitData, HttpServer } from "../../models/common.models";
 import { CommonRoutesConfig } from "../../common/common.routes.config";
 import { ChatMiddlewareHandler } from "../../middlewares/chatMiddleware";
-import { chatSessionManager } from "../../managers/chatSessionManager";
+import { ChatSessionManager, chatSessionManager } from "../../managers/chatSessionManager";
 import { databaseManager } from "../../managers/databaseManager";
 import { Application } from "express";
 import { Server, Socket } from "socket.io";
 import { APPLICATION_CONFIG } from "../../utils/configs/applicationConfig";
+import { VideoConnectionManager, videoConnectionManager } from "../../managers/videoConnectionManager";
 
 
 export class SocketRoutes extends CommonRoutesConfig {
 
   private serverIO!: Server;
+  private chatSessionManager!: ChatSessionManager;
+  private videoConnectionManager!: VideoConnectionManager;
 
   constructor(app: Application, server: HttpServer) {
 
@@ -24,15 +27,21 @@ export class SocketRoutes extends CommonRoutesConfig {
       this.initSocketServer(initData.httpServer);
     }
 
+    this.initManagers();
+
     super.init(initData);
+  }
+
+  private initManagers(): void {
+
+    this.chatSessionManager = chatSessionManager;
+    this.videoConnectionManager = videoConnectionManager;
   }
 
   private initSocketServer(httpServer: HttpServer): void {
     this.serverIO = new Server(httpServer, {
       cors: {
-        methods: ["GET", "POST"],
-        credentials: true,
-        origin: APPLICATION_CONFIG.CORS_CONFIG.origin,
+        origin: '*'
       }
     });
   }
@@ -55,25 +64,9 @@ export class SocketRoutes extends CommonRoutesConfig {
 
   private configureWebRTCConnection = (socket: Socket) => {
 
-    socket.on("call-user", data => {
+    this.videoConnectionManager.setupCallUser(socket);
 
-      const recivedID = chatSessionManager.findSocketIdByUserName(data.to) as string;
-
-      socket.to(recivedID).emit("call-made", {
-        offer: data.offer,
-        socket: socket.id
-      });
-    });
-
-    socket.on("make-answer", (data) => {
-
-      const recivedID = chatSessionManager.findSocketIdByUserName(data.to) as string;
-
-      socket.to(recivedID).emit("answer-made", {
-        socket: socket.id,
-        answer: data.answer
-      });
-    });
+    this.videoConnectionManager.setupMakeAnswer(socket);
   }
 
   private configureChatConnection = async (socket: Socket & any) => {
@@ -87,7 +80,7 @@ export class SocketRoutes extends CommonRoutesConfig {
 
     socket.emit("init-chats", await databaseManager.getUserChatHistory(socket.userName));
 
-    const allSessions = chatSessionManager.findAllSessions();
+    const allSessions = this.chatSessionManager.findAllSessions();
 
     socket.emit("all-users", allSessions);
 
@@ -100,7 +93,7 @@ export class SocketRoutes extends CommonRoutesConfig {
 
     socket.on('private-message', async ({ content, to }: any) => {
 
-      const recivedID = chatSessionManager.findSocketIdByUserName(to);
+      const recivedID = this.chatSessionManager.findSocketIdByUserName(to);
 
       const messageData = {
         to: to,
@@ -121,7 +114,7 @@ export class SocketRoutes extends CommonRoutesConfig {
 
     socket.on('disconnect', async () => {
       socket.broadcast.emit('user-disconnected', socket.userName);
-      chatSessionManager.removeSession(socket.socketId);
+      this.chatSessionManager.removeSession(socket.socketId);
     });
   }
 }
