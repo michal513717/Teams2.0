@@ -1,23 +1,22 @@
 import { SessionRecord } from "../models/common.models";
 
-
 export class ChatSessionManager {
-  private sessions: Map<string, SessionRecord>;
+  private sessions: Record<string, SessionRecord>;
 
   constructor() {
-    this.sessions = new Map();
+    this.sessions = {};
   }
 
   public findSession(id: string): SessionRecord | null {
-    return this.sessions.get(id) ?? null;
+    return this.sessions[id] ?? null;
   }
 
   public saveSession(id: string, session: SessionRecord): void {
-    this.sessions.set(id, session);
+    this.sessions[id] = session;
   }
 
   public findAllSessions(): SessionRecord[] {
-    return [...this.sessions.values()];
+    return Object.values(this.sessions);
   }
 
   public getSessions() {
@@ -25,11 +24,15 @@ export class ChatSessionManager {
   }
 
   public removeSession(socketId: string): void {
-    this.sessions.delete(socketId);
+    delete this.sessions[socketId];
   }
 
-  public isUserConnected(userName: string): boolean {
+  public isUserConnectedByUserName(userName: string): boolean {
     return this.findSocketIdByUserName(userName) !== null;
+  }
+
+  public isUserConnectedBySocketId(socketId: string): boolean {
+    return this.findSession(socketId) !== null;
   }
 
   public findSocketIdByUserName(userName: string): null | string {
