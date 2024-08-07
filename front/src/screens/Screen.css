@@ -58,17 +58,22 @@ body {
 }
 
 .chat-container {
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  background-color: #A8F9FF;
+  height: 100%;
+  margin-left: 260px;
+}
+
+.user-card-hover:hover {
+  background-color: #43134d;
 }
 
 .chat-header {
    display: flex;
    justify-content: space-between;
    align-items: center;
-   background-color: #AA7BC3;
+   
+   border-bottom: 1px solid black;
    padding: 10px;
 }
 
@@ -127,4 +132,8 @@ body {
 
 .message-input button:disabled {
   background-color: #ccc;
+}
+
+.user-selected{
+  background-color: #4b015a;
 }

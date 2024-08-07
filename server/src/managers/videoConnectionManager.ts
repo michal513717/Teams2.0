@@ -1,10 +1,10 @@
 import { Socket } from "socket.io";
-import { chatSessionManager, ChatSessionManager } from "./chatSessionManager";
+import { sessionManager, SessionManager } from "./sessionManager";
 import { GLOBAL_CONFIG } from "../../../config.global";
 
 export class VideoConnectionManager {
 
-  private chatSessionManager!: ChatSessionManager;
+  private sessionManager!: SessionManager;
 
   constructor() {
     this.init();
@@ -15,13 +15,13 @@ export class VideoConnectionManager {
   }
 
   private setupManagers(): void {
-    this.chatSessionManager = chatSessionManager;
+    this.sessionManager = sessionManager;
   }
 
   public setupCallUser(socket: Socket): void {
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_USER, data => {
 
-      const recivedID = this.chatSessionManager.findSocketIdByUserName(data.to) as string;
+      const recivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
       //TODO add error handler if reciverID is null
 
@@ -35,7 +35,7 @@ export class VideoConnectionManager {
   public setupMakeAnswer(socket: Socket): void {
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.MAKE_ANSWER, (data) => {
 
-      const recivedID = this.chatSessionManager.findSocketIdByUserName(data.to) as string;
+      const recivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
       //TODO add error handler if reciverID is null
 

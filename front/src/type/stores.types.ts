@@ -13,7 +13,7 @@ export type ChatStore = {
   messages: Message[] | null;
   socket: Socket | null;
   selectedUserChat: string | null;
-  setSelectedUserChat: (value: string) => void;
+  setSelectedUserChat: (value: string | null) => void;
   setChatUsers: (value: UserStatus[]) => void;
   setMessages: (value: Message[] | null) => void;
   setSocket: (value: Socket | null) => void;

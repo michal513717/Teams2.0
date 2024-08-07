@@ -1,9 +1,7 @@
-import { chatSessionManager } from "../managers/chatSessionManager";
+import { sessionManager } from "../managers/sessionManager";
 import { ChatSocketType, NextFunction } from "../models/common.models";
 import { InvalidTokenError } from "../utils/errors";
-import { Helper } from "../utils/helper";
 import { Authenticator } from "./aunthenicator";
-
 
 export class ChatMiddlewareHandler {
   public static verifyConnection = async (socket: ChatSocketType, next: NextFunction) => {
@@ -20,11 +18,13 @@ export class ChatMiddlewareHandler {
 
       const parsedToken = await Authenticator.verifyTokenSocketMiddleware(socket, next);
 
-      if (chatSessionManager.isUserConnectedByUserName(parsedToken.userName) === true) {
+      if (sessionManager.isUserConnectedByUserName(parsedToken.userName) === true) {
 
-        const prevSession = chatSessionManager.findSession(parsedToken.userName)!;
+        const prevSession = sessionManager.findSession(parsedToken.userName);
 
-        chatSessionManager.removeSession(prevSession.socketId);
+        if (prevSession !== null) {
+          sessionManager.removeSession(prevSession.socketId);
+        }
       }
 
       socket.sessionID = socket.id;
@@ -32,13 +32,14 @@ export class ChatMiddlewareHandler {
 
       next();
     } catch (error) {
-      console.log('error chat Middleware');
+      console.log(error)
+      console.warn('error chat Middleware');
     }
   }
 
   public static createSession = async (socket: ChatSocketType, next: NextFunction) => {
     try {
-      chatSessionManager.saveSession(socket.sessionID, {
+      sessionManager.saveSession(socket.sessionID, {
         socketId: socket.id,
         userName: socket.userName,
         connected: true
@@ -46,7 +47,7 @@ export class ChatMiddlewareHandler {
 
       next();
     } catch (err) {
-      console.log(err);
+      console.warn(err);
     }
   }
 }

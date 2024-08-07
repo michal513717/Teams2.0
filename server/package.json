@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "private": true,
     "scripts": {
-        "dev": "ts-node-dev --inspect ./index.ts",
+        "dev": "ts-node-dev ./index.ts",
         "debug": "node --inspect -r ts-node/register ./index.ts",
         "build": "turbo build"
     },

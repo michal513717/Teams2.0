@@ -1,6 +1,6 @@
 import { SessionRecord } from "../models/common.models";
 
-export class ChatSessionManager {
+export class SessionManager {
   private sessions: Record<string, SessionRecord>;
 
   constructor() {
@@ -48,4 +48,4 @@ export class ChatSessionManager {
   }
 }
 
-export const chatSessionManager = new ChatSessionManager();
+export const sessionManager = new SessionManager();

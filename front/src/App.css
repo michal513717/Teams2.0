@@ -69,10 +69,6 @@ body{
   background-color: #86bb71;
 }
 
-.selected {
-  background-color: #1164a3;
-}
-
 .user {
   padding: 10px;
 }
@@ -104,10 +100,6 @@ body{
   overflow-x: hidden;
   background-color: #3f0e40;
   color: white;
-}
-
-.selected {
-  background-color: #1164a3;
 }
 
 .user {
