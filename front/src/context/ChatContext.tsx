@@ -1,10 +1,10 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { getAccessToken, removeSessionID } from "@/stores/localStorage";
+import { getAccessToken } from "@/stores/localStorage";
 import { io, Socket } from "socket.io-client";
 import { CONFIG } from "@/utils/config";
 import { useAuthStore } from "@/stores/authStorage";
-
+import { GLOBAL_CONFIG } from "./../../../config.global";
 
 export interface ChatUser {
   userName: string;
@@ -27,6 +27,13 @@ export type ChatHistory = {
   time: Date;
   message: string;
   sender: string;
+}
+
+export type ChatHistoryData = {
+  from: string;
+  message: string;
+  to: string;
+  timestamp: string;
 }
 
 export interface ChatContextType {
@@ -83,7 +90,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       console.log("Connected to WebSocket server");
     });
 
-    newSocket.on("init-chats", (chatHistory: { from: string; message: string; to: string; timestamp: string }[]) => {
+    newSocket.on(GLOBAL_CONFIG.SOCKET_EVENTS.INIT_CHATS, (chatHistory: ChatHistoryData[]) => {
 
       const formattedMessages = chatHistory.map((msg) => ({
         from: msg.from,
@@ -94,7 +101,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       setMessages(formattedMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()));
     });
 
-    newSocket.on("private-message", (message: { from: string; message: string; to: string; timestamp: string }) => {
+    newSocket.on("private-message", (message: ChatHistoryData) => {
       const formattedMessage = {
         from: message.from,
         to: message.to,
@@ -135,7 +142,8 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     });
 
     newSocket.on("disconnect", () => {
-      removeSessionID();
+      // removeSessionID();
+      // TODO remove user
     });
 
     return () => {

@@ -26,7 +26,7 @@ export class ChatConnectionManager {
 
     socket.join(socket.userID);
 
-    socket.emit("init-chats", await this.databaseManager.getUserChatHistory(socket.userName));
+    socket.emit(GLOBAL_CONFIG.SOCKET_EVENTS.INIT_CHATS, await this.databaseManager.getUserChatHistory(socket.userName));
 
     const allSessions = this.sessionManager.findAllSessions();
 

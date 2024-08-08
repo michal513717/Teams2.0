@@ -1,34 +1,27 @@
 import { useVideoStore } from "@/stores/videoStorage"
-import { peerConnection } from "@/utils/globals";
-import { Modal, Box } from "@mui/material"
-import { useEffect, useRef, useState } from "react";
-
-
+import { Modal } from "@mui/material"
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export const VideoModal = () => {
-  const [localVideo, setLocalVideo] = useState();
   const localVideoElement = useRef<HTMLVideoElement>(null);
   const callerVideoElement = useRef<HTMLVideoElement>(null);
 
   const { isModalOpen } = useVideoStore();
 
   useEffect(() => {
-    if(isModalOpen === false) return;
-    
-    window.navigator.mediaDevices.getUserMedia({
-      video: true, audio: true
-    }).then((stream) => {
-      if(!localVideoElement.current) return;
-      localVideoElement.current.srcObject = stream;
-      stream.getTracks().forEach( track => peerConnection.addTrack(track, stream));
-    });
+    if (isModalOpen === false) return;
 
-    peerConnection.ontrack = function({ streams: [stream] }) {
-      if(!callerVideoElement.current) return;
-      callerVideoElement.current.srcObject = stream;
-    }
+    setupLocalVideo();
 
   }, [isModalOpen]);
+
+  const setupLocalVideo = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+    if (!localVideoElement.current) return;
+
+    localVideoElement.current.srcObject = stream;
+  }
 
   return (
     <Modal
@@ -37,8 +30,10 @@ export const VideoModal = () => {
       aria-describedby="modal-modal-description"
     >
       <div className="modal-style">
-        <video ref={localVideoElement}/>
-        <video ref={callerVideoElement}/>
+        {/* <button onClick={call}>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Rem illo placeat, accusantium commodi porro natus eius ut similique reprehenderit non.</button> */}
+        {/* <button onClick={active}>active</button> */}
+        <video autoPlay={true} className="video-call" ref={localVideoElement} />
+        <video autoPlay={true} className="video-call" id="local-video" ref={callerVideoElement} />
       </div>
     </Modal>
   )

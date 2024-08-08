@@ -133,3 +133,11 @@ body{
   display: flex;
   flex-direction: row;
 }
+
+.video-call{
+  width: 50%;
+}
+
+.video-call:nth-child(1){
+  border-right: 2px solid black;
+}

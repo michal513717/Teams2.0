@@ -1,6 +1,4 @@
 
-//TODO shoulde be moved to global config
-
 export const CONFIG = {
   SERVER_URL: 'http://localhost:8080',
 
