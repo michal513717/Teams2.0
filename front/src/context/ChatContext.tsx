@@ -1,10 +1,11 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { getAccessToken } from "@/stores/localStorage";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import { CONFIG } from "@/utils/config";
 import { useAuthStore } from "@/stores/authStorage";
 import { GLOBAL_CONFIG } from "./../../../config.global";
+import { useSocketStore } from "@/stores/socketStorage";
 
 export interface ChatUser {
   userName: string;
@@ -46,17 +47,19 @@ export const ChatContext = createContext<ChatContextType | null>(null);
 
 const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { userName } = useAuthStore();
+  const { setSocket, socket } = useSocketStore();
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [socket, setSocket] = useState<Socket | null>(null);
 
   const fetchUsers = async () => {
     try {
       const accessToken = getAccessToken();
-      const response = await axios.get("http://localhost:8080/info/allUsers", {
+      const response = await axios({
+        url: CONFIG.SERVER_URL + CONFIG.END_POINTS.ALL_USERS,
+        method: "GET",
         headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+          Authorization: `Bearer ${accessToken}`
+        }
       });
       const users = response.data.result.map((name: string) => ({
         userName: name,
@@ -86,6 +89,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     });
 
     setSocket(newSocket);
+
     newSocket.on("connect", () => {
       console.log("Connected to WebSocket server");
     });

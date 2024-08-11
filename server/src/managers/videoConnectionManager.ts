@@ -18,8 +18,8 @@ export class VideoConnectionManager {
     this.sessionManager = sessionManager;
   }
 
-  public setupCallUser(socket: Socket): void {
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_USER, data => {
+  public setupCallUser(socket: Socket & any): void {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_USER, (data: any) => {
 
       const recivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
@@ -27,13 +27,14 @@ export class VideoConnectionManager {
 
       socket.to(recivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, {
         offer: data.offer,
-        socket: socket.id
+        socket: socket.id,
+        userName: socket.userName
       });
     });
   }
 
-  public setupMakeAnswer(socket: Socket): void {
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.MAKE_ANSWER, (data) => {
+  public setupMakeAnswer(socket: Socket & any): void {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.MAKE_ANSWER, (data: any) => {
 
       const recivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
@@ -41,7 +42,8 @@ export class VideoConnectionManager {
 
       socket.to(recivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, {
         socket: socket.id,
-        answer: data.answer
+        answer: data.answer,
+        userName: socket.userName
       });
     });
   }

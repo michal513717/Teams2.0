@@ -7,6 +7,7 @@ import { VideoModal } from "@/components/VideoModal";
 import ChatProvider from "@/context/ChatContext";
 import { useChatStorage } from "@/stores/chatStorage";
 import { useChat } from "@/hooks/useChat";
+import VideoProvider from "@/context/VideoCallContext";
 
 const MainScreen: React.FC = () => {
 
@@ -29,8 +30,10 @@ const MainScreen: React.FC = () => {
     <ChatProvider>
       <Box width={1} height={1}>
         <SidePanelMenu />
-        <ChatScreen chat_user={selectedUserChat ?? ""} />
-        <VideoModal />
+        <VideoProvider>
+          <ChatScreen chat_user={selectedUserChat ?? ""} />
+          <VideoModal />
+        </VideoProvider>
       </Box>
     </ChatProvider>
   );

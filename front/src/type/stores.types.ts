@@ -26,3 +26,8 @@ export type VideoStore = {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
 }
+
+export type SocketStore = {
+  socket: Socket | null;
+  setSocket: (value: Socket | null) => void;
+}

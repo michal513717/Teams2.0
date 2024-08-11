@@ -20,7 +20,8 @@ export class ChatMiddlewareHandler {
 
       if (sessionManager.isUserConnectedByUserName(parsedToken.userName) === true) {
 
-        const prevSession = sessionManager.findSession(parsedToken.userName);
+        const prevSessionId = sessionManager.findSocketIdByUserName(parsedToken.userName) as string;;
+        const prevSession = sessionManager.findSession(prevSessionId);
 
         if (prevSession !== null) {
           sessionManager.removeSession(prevSession.socketId);

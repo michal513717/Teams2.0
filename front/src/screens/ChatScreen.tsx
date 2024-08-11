@@ -3,12 +3,14 @@ import CallIcon from "@mui/icons-material/Call";
 import { useState, useContext, useEffect } from "react";
 import { ChatContext, ChatContextType } from "@/context/ChatContext";
 import { useAuthStore } from "@/stores/authStorage";
+import { useVideo, VideoContext, VideoContextType } from "@/context/VideoCallContext";
 
 type Props = { chat_user: string | undefined };
 
 const ChatScreen: React.FC<Props> = ({ chat_user }) => {
   const [input, setInput] = useState<string>("");
   const { userName } = useAuthStore();
+  const { callUser } = useContext(VideoContext) as VideoContextType;
   const { messages, sendMessage } = useContext(ChatContext) as ChatContextType;
 
   const handleSendMessage = () => {
@@ -19,19 +21,18 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
   };
 
   const filteredMessages = messages.filter(msg => {
-    if (chat_user === userName) {
-      return msg.from === userName && msg.to === userName;
-    } else {
-      return msg.to === chat_user || msg.from === chat_user;
-    }
+    return chat_user === userName ? msg.from === userName && msg.to === userName : msg.to === chat_user || msg.from === chat_user;
   });
 
+  const handleCallUser = () => {
+    callUser(chat_user as string);
+  }
 
   return (
     <div className="chat-container" >
       <div className="chat-header">
         <div>{chat_user}</div>
-        <Button variant="contained" startIcon={<CallIcon />}>
+        <Button variant="contained" startIcon={<CallIcon />} onClick={handleCallUser}>
           Call
         </Button>
       </div>

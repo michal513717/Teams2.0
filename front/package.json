@@ -12,6 +12,7 @@
     }
   },
   "type": "module",
+  "proxy": "http://localhost:8080",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",

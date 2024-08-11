@@ -1,27 +1,75 @@
-import { useVideoStore } from "@/stores/videoStorage"
+import { useVideoStore } from "./../stores/videoStorage"
 import { Modal } from "@mui/material"
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { VideoContext, VideoContextType } from "./../context/VideoCallContext";
 
 export const VideoModal = () => {
   const localVideoElement = useRef<HTMLVideoElement>(null);
   const callerVideoElement = useRef<HTMLVideoElement>(null);
 
+  const [remoteVideoRefs, setRemoteVideoRefs] = useState<HTMLVideoElement[]>([]);
+
+  const { peerConnection } = useContext(VideoContext) as VideoContextType;
+
   const { isModalOpen } = useVideoStore();
 
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+
   useEffect(() => {
-    if (isModalOpen === false) return;
+    // Uzyskaj lokalny strumień wideo
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        console.log("stream on")
+        if (localVideoRef.current) {
+          console.log("OK")
+          localVideoRef.current.srcObject = stream;
+          //@ts-ignore
+          localVideoRef.autoplay = true;
+          //@ts-ignore
+          localVideoRef.playsInline = true;
+        }
 
-    setupLocalVideo();
+        stream.getTracks().forEach(track => {
+          peerConnection.addTrack(track, stream);
+        });
+      })
+      .catch((err) => {
+        console.error("Błąd dostępu do kamery:", err);
+      });
 
-  }, [isModalOpen]);
+    // Obsługa strumienia wideo z połączenia zdalnego
 
-  const setupLocalVideo = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    peerConnection.ontrack = (event) => {
+      console.log("remote")
+      setRemoteVideoRefs((prevRefs) => {
+        const newVideoRef = document.createElement("video");
+        newVideoRef.srcObject = event.streams[0];
+        newVideoRef.className = "video-call";
+        newVideoRef.autoplay = true;
+        newVideoRef.playsInline = true;
+        return [newVideoRef];
+      });
+    };
+    // peerConnection.ontrack = ({ streams: [stream] }) => {
+    //   console.log("stream remote")
+    //   console.log(event)
+    //   if (!remoteVideoRef.current?.srcObject) {
+    //     console.log(stream)
+    //     console.log(remoteVideoRef)
+    //     console.log(document.getElementById('remote-video'))
+    //     //@ts-ignore
+    //     document.getElementById('remote-video').srcObject = stream;
+    //   } else if (!secondRemoteVideoRef.current?.srcObject) {
+    //     console.log(secondRemoteVideoRef)
+    //     secondRemoteVideoRef.current!.srcObject = stream;
+    //   }
+    // };
 
-    if (!localVideoElement.current) return;
+  }, [peerConnection, remoteVideoRef]);
 
-    localVideoElement.current.srcObject = stream;
-  }
+  console.log(remoteVideoRefs)
 
   return (
     <Modal
@@ -30,10 +78,23 @@ export const VideoModal = () => {
       aria-describedby="modal-modal-description"
     >
       <div className="modal-style">
-        {/* <button onClick={call}>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Rem illo placeat, accusantium commodi porro natus eius ut similique reprehenderit non.</button> */}
-        {/* <button onClick={active}>active</button> */}
-        <video autoPlay={true} className="video-call" ref={localVideoElement} />
-        <video autoPlay={true} className="video-call" id="local-video" ref={callerVideoElement} />
+
+        <video autoPlay={true} className="video-call" ref={localVideoRef} />
+        <>
+          {
+            remoteVideoRefs.map((videoRef, index) => {
+              return (
+
+                <div key={index}>
+                  <h3>Remote Video {index + 1}</h3>
+                  <div ref={(node) => node?.appendChild(videoRef)} />
+                </div>
+              )
+            })
+          }
+        </>
+
+
       </div>
     </Modal>
   )

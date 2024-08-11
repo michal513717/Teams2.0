@@ -16,9 +16,9 @@ const App: React.FC = () => {
     checkAuthStatus();
   }, []);
 
-  useEffect(() => {
-    checkAuthStatus();
-  }, [isAuthenticated]);
+  // useEffect(() => {
+  //   checkAuthStatus();
+  // }, [isAuthenticated]);
 
   if (isAuthenticated === null) {
     return <p>loading</p>;
