@@ -1,7 +1,7 @@
 import { SECRET } from "../utils/configs/secret";
 import Jwt, { JwtPayload } from "jsonwebtoken";
 
-export class AuthroizationTokenManager {
+export class AuthorizationTokenManager {
   
   public static generateToken(userName: string): {
     accessToken: string,
@@ -24,8 +24,7 @@ export class AuthroizationTokenManager {
 
   public static verifyToken(token: string): JwtPayload | null {
     try {
-        const payload = Jwt.verify(token, SECRET.JWT_SECRET) as JwtPayload;
-        return payload;
+        return Jwt.verify(token, SECRET.JWT_SECRET) as JwtPayload;
     } catch (error) {
         return null;
     }

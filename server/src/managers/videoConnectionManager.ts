@@ -21,11 +21,11 @@ export class VideoConnectionManager {
   public setupCallUser(socket: Socket & any): void {
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_USER, (data: any) => {
 
-      const recivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
+      const receivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
       //TODO add error handler if reciverID is null
 
-      socket.to(recivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, {
+      socket.to(receivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, {
         offer: data.offer,
         socket: socket.id,
         userName: socket.userName
@@ -36,11 +36,11 @@ export class VideoConnectionManager {
   public setupMakeAnswer(socket: Socket & any): void {
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.MAKE_ANSWER, (data: any) => {
 
-      const recivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
+      const receivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
       //TODO add error handler if reciverID is null
 
-      socket.to(recivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, {
+      socket.to(receivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, {
         socket: socket.id,
         answer: data.answer,
         userName: socket.userName

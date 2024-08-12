@@ -8,17 +8,17 @@ export const VideoModal = () => {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
 
-  const { isModalOpen } = useVideoStore();
+  const { isVideoModalOpen, isRequestCallModalOpen } = useVideoStore();
   const { selectedUserChat } = useChatStorage();
   const { callUser, peerConnection } = useContext(VideoContext) as VideoContextType;
 
   useEffect(() => {
     
-    if(isModalOpen === false) return;
+    if(isVideoModalOpen === false) return;
 
     setLocalVideo();
 
-  }, [isModalOpen]);
+  }, [isVideoModalOpen, isRequestCallModalOpen]);
 
   const setLocalVideo = useCallback(async() => {
     
@@ -28,8 +28,11 @@ export const VideoModal = () => {
 
     setLocalStream(stream);
 
+    if(isRequestCallModalOpen === true) return;
+    
     callUser(selectedUserChat as string);
-  },[selectedUserChat]);
+    
+  },[selectedUserChat, isRequestCallModalOpen]);
 
   const addToPeerConnection = useCallback((stream: MediaStream) =>{
     stream.getTracks().forEach(track => {
@@ -39,7 +42,7 @@ export const VideoModal = () => {
 
   return (
     <Modal
-      open={isModalOpen}
+      open={isVideoModalOpen}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >

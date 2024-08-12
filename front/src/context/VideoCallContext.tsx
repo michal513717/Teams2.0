@@ -8,9 +8,10 @@ import { useChatStorage } from "@/stores/chatStorage";
 import { useVideoStore } from "@/stores/videoStorage";
 
 export type VideoContextType = {
-  callUser: (userName: string) => void;
   peerConnection: RTCPeerConnection;
-}
+  callUser: (userName: string) => void;
+  callAnswerMade: (to: string) => void;
+};
 
 const { RTCPeerConnection } = window;
 
@@ -20,9 +21,10 @@ export const VideoContext = createContext<VideoContextType | null>(null);
 
 const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAlreadyCalling, setIsAlreadyCalling] = useState<boolean>(false);
-
+  const [offer, setOffer] = useState<any>();
   const { userName } = useAuthStore();
   const { socket } = useSocketStore();
+  const { setIsRequestCallModalOpen } = useVideoStore();
   const { chatUsers } = useChatStorage();
 
 
@@ -33,23 +35,9 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, async (data) => {
       console.log("call made")
 
-      //TODO implement call answer
-      // const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      // let a = document.getElementById('local')
-      // //@ts-ignore
-      // a.srcObject = stream;
-      // stream.getTracks().forEach(track => {
-      //   peerConnection.addTrack(track, stream);
-      // });
+      setIsRequestCallModalOpen(true);
 
-      await peerConnection.setRemoteDescription(
-        new RTCSessionDescription(data.offer)
-      );
-
-      const answer = await peerConnection.createAnswer();
-      await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
-
-      callAnswerMade(answer, data.userName);
+      setOffer(data.offer);
     });
 
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, async (data) => {
@@ -110,20 +98,27 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     });
   }, [socket, userName, chatUsers]);
 
-  const callAnswerMade = useCallback((answer: RTCSessionDescriptionInit, to: string) => {
+  const callAnswerMade = useCallback(async(to: string) => {
     if (socket === null) {
       console.warn("Socket is null, can't call user");
       return;
     }
+
+    await peerConnection.setRemoteDescription(
+      new RTCSessionDescription(offer)
+    );
+
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
 
     socket.emit(GLOBAL_CONFIG.SOCKET_EVENTS.MAKE_ANSWER, {
       answer,
       to
     })
 
-  }, [socket])
+  }, [socket, offer])
 
-
+  //TODO implement
   peerConnection.ontrack = function ({ streams: [stream] }) {
     console.log("rmoet")
     const remoteVideo = document.getElementById("remote");
@@ -134,7 +129,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   };
 
   return (
-    <VideoContext.Provider value={{ callUser, peerConnection }}>
+    <VideoContext.Provider value={{ callUser, callAnswerMade, peerConnection }}>
       {children}
     </VideoContext.Provider>
   );

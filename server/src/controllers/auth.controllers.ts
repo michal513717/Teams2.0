@@ -7,8 +7,7 @@ import { internalServerErrorResponse, validationErrorResponse } from "../utils/r
 import { ObjectId } from "mongodb";
 import { ZodError } from "zod";
 import { UnauthorizedError, UserNotFoundError, UsernameTakenError } from "../utils/errors";
-import { AuthroizationTokenManager } from "../managers/tokenManager";
-
+import { AuthorizationTokenManager } from "../managers/tokenManager";
 
 export const loginController = async (
   req: Request,
@@ -27,7 +26,7 @@ export const loginController = async (
       throw new UnauthorizedError();
     }
 
-    const tokens = AuthroizationTokenManager.generateToken(credentials.userName);
+    const tokens = AuthorizationTokenManager.generateToken(credentials.userName);
 
     res.status(200).json({
       status: CommonRoutesConfig.statusMessage.SUCCESS,
@@ -95,7 +94,7 @@ export const tokenCheckController = (
 
   const authHeader = req.headers.authorization;
   const token = authHeader!.split(' ')[1];
-  const payload = AuthroizationTokenManager.verifyToken(token);
+  const payload = AuthorizationTokenManager.verifyToken(token);
 
   res.status(200).json({
     status: CommonRoutesConfig.statusMessage.SUCCESS,

@@ -105,6 +105,8 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       setMessages(formattedMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()));
     });
 
+
+    //TODO import from config
     newSocket.on("private-message", (message: ChatHistoryData) => {
       const formattedMessage = {
         from: message.from,
@@ -118,6 +120,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       });
     });
 
+    //TODO import from config
     newSocket.on("all-users", (allUsers: UserStatus[]) => {
 
       setChatUsers((prevUsers) =>
@@ -128,6 +131,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       );
     });
 
+    //TODO import from config
     newSocket.on("user-connected", (user) => {
       const userName = user.userName;
       setChatUsers((prevUsers) =>
@@ -137,6 +141,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       );
     });
 
+    //TODO import from config
     newSocket.on("user-disconnected", (userName) => {
       setChatUsers((prevUsers) =>
         prevUsers.map((u) => {
@@ -159,6 +164,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     if (socket) {
       if (userName) {
         const timestamp = new Date().toISOString();
+        //TODO import from config
         socket.emit("private-message", { content: message, to, timestamp });
         setMessages((prevMessages) => {
           const updatedMessages = [...prevMessages, { from: userName, to, content: message, timestamp }];

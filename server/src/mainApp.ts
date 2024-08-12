@@ -31,7 +31,7 @@ export class MainApp {
   private init(): void {
 
     this.initLogger();
-    this.initApplcationConfig();
+    this.initApplicationConfig();
     this.initApplicationAndServer();
     this.initBasicDebug();
     this.initRoutes();
@@ -43,7 +43,7 @@ export class MainApp {
     this.logger = LoggerHelper.getLogger("MainApp");
   }
 
-  private initApplcationConfig(): void {
+  private initApplicationConfig(): void {
 
     this.config = APPLICATION_CONFIG;
   }
@@ -69,7 +69,7 @@ export class MainApp {
   }
 
   //* in this function we declare add another routes.
-  //* Decalre of notValidRoutes should be at the end.
+  //* Declare of notValidRoutes should be at the end.
   private initRoutes(): void {
 
     const application = this.application;

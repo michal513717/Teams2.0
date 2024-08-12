@@ -1,13 +1,13 @@
-import { getAllUsersController } from "../../controllers/infomration.controllers";
+import { getAllUsersController } from "../../controllers/information";
 import { CommonRoutesConfig } from "../../common/common.routes.config";
-import { Authenticator } from "../../middlewares/aunthenicator";
+import { Authenticator } from "../../middlewares/authenticator";
 import type { Application } from "express";
 import express from "express";
 
 export class InformationRoute extends CommonRoutesConfig {
 
   constructor(app: Application) {
-    super(app, "Infomration Route", "0.0.1");
+    super(app, "Information Route", "0.0.1");
   }
 
   configureRoute(): Application {

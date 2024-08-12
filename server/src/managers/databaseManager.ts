@@ -60,7 +60,7 @@ export class DatabaseManager {
     return result;
   }
 
-  public async getAllMesseges(userName: string): Promise<ChatDatabaseSchema[]> {
+  public async getAllMessages(userName: string): Promise<ChatDatabaseSchema[]> {
     const collection = await this.getCollection<ChatDatabaseSchema>("CHAT_COLLECTION");
 
     const cursorData = await collection.find({
@@ -126,7 +126,7 @@ export class DatabaseManager {
   }
 
   public async getUserChatHistory(userName: string) {
-    const chatHistory = await this.getAllMesseges(userName);
+    const chatHistory = await this.getAllMessages(userName);
     let result: ChatInitData[] = [];
 
     chatHistory.forEach((chatRecord) => {

@@ -23,8 +23,12 @@ export type ChatStore = {
 };
 
 export type VideoStore = {
-  isModalOpen: boolean;
-  setIsModalOpen: (value: boolean) => void;
+  isVideoModalOpen: boolean;
+  isRequestCallModalOpen: boolean;
+  callerUserName: string | null;
+  setCallerUserName: (value: string | null) => void;
+  setIsVideoModalOpen: (value: boolean) => void;
+  setIsRequestCallModalOpen: (value: boolean) => void;
 }
 
 export type SocketStore = {

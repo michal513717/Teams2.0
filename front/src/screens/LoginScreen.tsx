@@ -25,7 +25,7 @@ const LoginForm: React.FC = () => {
   const handleLoginSubmit = useCallback(
     async (data: any) => {
       console.log("Login Data:", data);
-      const status = await loginUser(data.username, data.password);
+      await loginUser(data.username, data.password);
     },
     [loginUser]
   );

@@ -41,7 +41,7 @@ export class ChatConnectionManager {
 
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.SEND_PRIVATE_MESSAGE, async ({ content, to }: any) => {
 
-      const recivedID = this.sessionManager.findSocketIdByUserName(to);
+      const receivedID = this.sessionManager.findSocketIdByUserName(to);
 
       const messageData = {
         to: to,
@@ -52,7 +52,7 @@ export class ChatConnectionManager {
 
       databaseManager.saveMessage(messageData);
 
-      socket.to(recivedID).to(socket.userID)
+      socket.to(receivedID).to(socket.userID)
         .emit(GLOBAL_CONFIG.SOCKET_EVENTS.SEND_PRIVATE_MESSAGE, {
           to: to,
           message: content,
