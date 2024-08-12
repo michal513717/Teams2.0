@@ -1,12 +1,10 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from "react";
 import { getAccessToken } from "@/stores/localStorage";
-import { io, Socket } from "socket.io-client";
 import { CONFIG } from "@/utils/config";
 import { useAuthStore } from "@/stores/authStorage";
 import { GLOBAL_CONFIG } from "./../../../config.global";
 import { useSocketStore } from "@/stores/socketStorage";
 import { useChatStorage } from "@/stores/chatStorage";
-import { useAlert } from "./AlertContext";
 import { useVideoStore } from "@/stores/videoStorage";
 
 export type VideoContextType = {
@@ -21,11 +19,8 @@ const peerConnection = new RTCPeerConnection();
 export const VideoContext = createContext<VideoContextType | null>(null);
 
 const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const showAlert = useAlert();
-
   const [isAlreadyCalling, setIsAlreadyCalling] = useState<boolean>(false);
 
-  const { setIsModalOpen } = useVideoStore();
   const { userName } = useAuthStore();
   const { socket } = useSocketStore();
   const { chatUsers } = useChatStorage();
@@ -37,6 +32,16 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, async (data) => {
       console.log("call made")
+
+      //TODO implement call answer
+      // const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      // let a = document.getElementById('local')
+      // //@ts-ignore
+      // a.srcObject = stream;
+      // stream.getTracks().forEach(track => {
+      //   peerConnection.addTrack(track, stream);
+      // });
+
       await peerConnection.setRemoteDescription(
         new RTCSessionDescription(data.offer)
       );
@@ -52,9 +57,8 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
       await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer))
 
-      if (!isAlreadyCalling) {
+      if (isAlreadyCalling === false) {
         await callUser(data.userName, true);
-        setIsModalOpen(true)
         setIsAlreadyCalling(true);
       }
     });
@@ -77,7 +81,6 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       console.warn("Socket is null, can't call user");
       return;
     }
-    console.log(isSecondCall)
 
     for (const chatUser of chatUsers) {
       if (chatUser.userName === userName) {
@@ -97,9 +100,10 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       return;
     }
 
-    const offer = await peerConnection.createOffer();
+    const offer = await peerConnection.createOffer(); 
 
     await peerConnection.setLocalDescription(new RTCSessionDescription(offer));
+
     socket.emit("call-user", {
       offer,
       to: userName,
@@ -118,6 +122,16 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     })
 
   }, [socket])
+
+
+  peerConnection.ontrack = function ({ streams: [stream] }) {
+    console.log("rmoet")
+    const remoteVideo = document.getElementById("remote");
+    if (remoteVideo) {
+      //@ts-ignore
+      remoteVideo.srcObject = stream;
+    }
+  };
 
   return (
     <VideoContext.Provider value={{ callUser, peerConnection }}>

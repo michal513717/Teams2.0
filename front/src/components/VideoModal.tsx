@@ -10,7 +10,7 @@ export const VideoModal = () => {
 
   const { isModalOpen } = useVideoStore();
   const { selectedUserChat } = useChatStorage();
-  const { callUser } = useContext(VideoContext) as VideoContextType;
+  const { callUser, peerConnection } = useContext(VideoContext) as VideoContextType;
 
   useEffect(() => {
     
@@ -24,10 +24,18 @@ export const VideoModal = () => {
     
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
+    addToPeerConnection(stream);
+
     setLocalStream(stream);
 
     callUser(selectedUserChat as string);
   },[selectedUserChat]);
+
+  const addToPeerConnection = useCallback((stream: MediaStream) =>{
+    stream.getTracks().forEach(track => {
+      peerConnection.addTrack(track, stream);
+    });
+  }, [peerConnection]);
 
   return (
     <Modal
