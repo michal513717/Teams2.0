@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import ChatScreen from "./ChatScreen";
 import React, { useEffect } from "react";
-import "./Screen.css";
+import "./../components/css/Screen.css";
 import { SidePanelMenu } from "@/components/SidePanelMenu";
 import { VideoModal } from "@/components/VideoModal";
 import ChatProvider from "@/context/ChatContext";

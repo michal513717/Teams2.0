@@ -73,14 +73,14 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   useEffect(() => {
 
-    fetchUsers();
-
     const accessToken = getAccessToken();
 
     if (!accessToken || !userName) {
       console.error("Access token or username is missing");
       return;
     }
+
+    fetchUsers();
 
     const newSocket = io(CONFIG.SERVER_URL, {
       auth: {

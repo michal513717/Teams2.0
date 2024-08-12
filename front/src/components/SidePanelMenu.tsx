@@ -1,6 +1,6 @@
 import { useChatStorage } from "@/stores/chatStorage"
 import { Box, Button, CircularProgress, ListItem } from "@mui/material"
-import UserCard from "./UserCard";
+import UserCard from "./userCard";
 import { useContext, useEffect } from "react";
 import { useChat } from "@/hooks/useChat";
 import { useLogin } from "@/hooks/useLogin";
@@ -12,11 +12,11 @@ export const SidePanelMenu = () => {
   const { logoutUser } = useLogin();
   const { fetchUsers, isLoading } = useChat();
 
-  useEffect(() => {
-    if (chatUsers.length === 0) {
-      fetchUsers();
-    }
-  }, [chatUsers]);
+  // useEffect(() => {
+  //   if (chatUsers.length === 0) {
+  //     fetchUsers();
+  //   }
+  // }, [chatUsers]);
 
   const handleLogout = async () => {
     logoutUser();

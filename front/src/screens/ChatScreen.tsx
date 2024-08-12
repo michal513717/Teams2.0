@@ -4,13 +4,14 @@ import { useState, useContext, useEffect } from "react";
 import { ChatContext, ChatContextType } from "@/context/ChatContext";
 import { useAuthStore } from "@/stores/authStorage";
 import { useVideo, VideoContext, VideoContextType } from "@/context/VideoCallContext";
+import { useVideoStore } from "@/stores/videoStorage";
 
 type Props = { chat_user: string | undefined };
 
 const ChatScreen: React.FC<Props> = ({ chat_user }) => {
   const [input, setInput] = useState<string>("");
   const { userName } = useAuthStore();
-  const { callUser } = useContext(VideoContext) as VideoContextType;
+  const { setIsModalOpen } = useVideoStore();
   const { messages, sendMessage } = useContext(ChatContext) as ChatContextType;
 
   const handleSendMessage = () => {
@@ -25,7 +26,7 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
   });
 
   const handleCallUser = () => {
-    callUser(chat_user as string);
+    setIsModalOpen(true);
   }
 
   return (

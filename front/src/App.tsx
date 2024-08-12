@@ -6,7 +6,7 @@ import { useAuth } from './hooks/useAuth';
 import { mainRouter } from './routes';
 import { authRouter } from './routes';
 import theme from "./theme";
-import './App.css'
+import './components/css/App.css';
 
 
 const App: React.FC = () => {
