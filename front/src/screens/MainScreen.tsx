@@ -1,33 +1,40 @@
-import React from "react";
-import "./Screen.css";
-import { useUser } from "@/context/UserContext";
-import { Button } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
-import SideProfilesMenu from "./SideProfilesMenu";
-import ChatProvider from "@/context/ChatContext";
+import { Box } from "@mui/material";
 import ChatScreen from "./ChatScreen";
+import React, { useEffect } from "react";
+import "./../components/css/Screen.css";
+import { SidePanelMenu } from "@/components/SidePanelMenu";
+import { VideoModal } from "@/components/VideoModal";
+import ChatProvider from "@/context/ChatContext";
+import { useChatStorage } from "@/stores/chatStorage";
+import { useChat } from "@/hooks/useChat";
+import VideoProvider from "@/context/VideoCallContext";
 
 const MainScreen: React.FC = () => {
-  const { logoutUser } = useUser();
-  const navigate = useNavigate();
-  const { user_chat } = useParams();
 
-  const handleLogout = async () => {
-    logoutUser();
-    navigate("/login");
-  };
+  const { fetchUsers } = useChat();
+  const { chatUsers, selectedUserChat, setSelectedUserChat } = useChatStorage();
+
+  useEffect(() => {
+
+    if (chatUsers.length === 0) {
+      setSelectedUserChat(null);
+      fetchUsers();
+      return;
+    } else if (selectedUserChat === null) {
+      setSelectedUserChat(chatUsers[0].userName);
+    }
+
+  }, [chatUsers, selectedUserChat]);
 
   return (
     <ChatProvider>
-      <div className="main-screen">
-        <div className="sidebar">
-          <SideProfilesMenu chat_user={user_chat} />
-          <Button variant="contained" color="secondary" onClick={handleLogout}>
-            Logout
-          </Button>
-        </div>
-        <ChatScreen chat_user={user_chat} />
-      </div>
+      <Box width={1} height={1}>
+        <SidePanelMenu />
+        <VideoProvider>
+          <ChatScreen chat_user={selectedUserChat ?? ""} />
+          <VideoModal />
+        </VideoProvider>
+      </Box>
     </ChatProvider>
   );
 };

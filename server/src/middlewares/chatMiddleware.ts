@@ -1,63 +1,54 @@
-import { chatSessionManager } from "../managers/chatSessionManager";
+import { sessionManager } from "../managers/sessionManager";
 import { ChatSocketType, NextFunction } from "../models/common.models";
 import { InvalidTokenError } from "../utils/errors";
-import { Helper } from "../utils/helper";
 import { Authenticator } from "./aunthenicator";
-
 
 export class ChatMiddlewareHandler {
   public static verifyConnection = async (socket: ChatSocketType, next: NextFunction) => {
     try {
-      let sessionID = socket.handshake.auth.sessionID as string;
       let userToken = socket.handshake.auth.token as string;
-      
-      //!TMP
-      if(!userToken){
-        userToken = socket.handshake.headers.auth;
-      }
-      
-      if(!sessionID){
-        sessionID = socket.handshake.headers.sessionID;
+
+      if (!userToken) {
+        userToken = socket.handshake.headers.auth as string;
       }
 
-      if(!userToken){
+      if (!userToken) {
         return next(new InvalidTokenError());
-      }
-      
-      if(sessionID){
-        const session = chatSessionManager.findSession(sessionID);
-
-        if(session !== null) {
-          socket.sessionID = sessionID;
-          socket.userID = session.userID;
-          socket.userName = session.userName;
-          next();
-        }
       }
 
       const parsedToken = await Authenticator.verifyTokenSocketMiddleware(socket, next);
-      
-      socket.sessionID = Helper.getRandomID();
-      socket.userID = Helper.getRandomID();
+
+      if (sessionManager.isUserConnectedByUserName(parsedToken.userName) === true) {
+
+        const prevSessionId = sessionManager.findSocketIdByUserName(parsedToken.userName) as string;;
+        const prevSession = sessionManager.findSession(prevSessionId);
+
+        if (prevSession !== null) {
+          sessionManager.removeSession(prevSession.socketId);
+        }
+      }
+
+      socket.sessionID = socket.id;
       socket.userName = parsedToken.userName;
 
       next();
     } catch (error) {
-      console.log('error chat Middleware');
+      console.log(error)
+      console.warn('error chat Middleware');
     }
-  }   
+  }
 
-  public static createSession = async(socket: ChatSocketType, next: NextFunction) => {
+  public static createSession = async (socket: ChatSocketType, next: NextFunction) => {
     try {
-      chatSessionManager.saveSession(socket.sessionID, {
-        userID: socket.userID,
+      sessionManager.saveSession(socket.sessionID, {
+        socketId: socket.id,
         userName: socket.userName,
         connected: true
       });
 
       next();
-    } catch(err) {
-      console.log(err);
+    } catch (err) {
+      console.warn(err);
     }
   }
 }

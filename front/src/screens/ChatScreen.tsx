@@ -1,14 +1,17 @@
 import { Button } from "@mui/material";
 import CallIcon from "@mui/icons-material/Call";
 import { useState, useContext, useEffect } from "react";
-import { useUser } from "@/context/UserContext";
 import { ChatContext, ChatContextType } from "@/context/ChatContext";
+import { useAuthStore } from "@/stores/authStorage";
+import { useVideo, VideoContext, VideoContextType } from "@/context/VideoCallContext";
+import { useVideoStore } from "@/stores/videoStorage";
 
 type Props = { chat_user: string | undefined };
 
 const ChatScreen: React.FC<Props> = ({ chat_user }) => {
   const [input, setInput] = useState<string>("");
-  const { user } = useUser();
+  const { userName } = useAuthStore();
+  const { setIsModalOpen } = useVideoStore();
   const { messages, sendMessage } = useContext(ChatContext) as ChatContextType;
 
   const handleSendMessage = () => {
@@ -18,33 +21,25 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
     }
   };
 
-  useEffect(() => {
-    // Scroll to bottom when new messages are added
-    const chatWindow = document.querySelector(".chat-window");
-    if (chatWindow) {
-      chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
-  }, [messages]);
-
   const filteredMessages = messages.filter(msg => {
-    if (chat_user === user) {
-      return msg.from === user && msg.to === user;
-    } else {
-      return msg.to === chat_user || msg.from === chat_user;
-    }
+    return chat_user === userName ? msg.from === userName && msg.to === userName : msg.to === chat_user || msg.from === chat_user;
   });
 
+  const handleCallUser = () => {
+    setIsModalOpen(true);
+  }
+
   return (
-    <div className="chat-container">
+    <div className="chat-container" >
       <div className="chat-header">
         <div>{chat_user}</div>
-        <Button variant="contained" startIcon={<CallIcon />}>
+        <Button variant="contained" startIcon={<CallIcon />} onClick={handleCallUser}>
           Call
         </Button>
       </div>
       <div className="chat-window">
         {filteredMessages.map((msg, index) => (
-          <div key={index} className={`message-container ${msg.from === user ? 'from' : 'to'}`}>
+          <div key={index} className={`message-container ${msg.from === userName ? 'from' : 'to'}`}>
             <div className="message">
               <div className="message-content">{msg.content}</div>
               <div className="message-timestamp">{new Date(msg.timestamp).toLocaleString()}</div>

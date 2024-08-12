@@ -5,7 +5,7 @@ import { DatabaseManagerConfig } from "../utils/configs/databaseManagerConfig";
 import { MongoDatabase } from "../models/common.models";
 import { ChatDatabaseSchema, ChatInitData, ConversationData, UserDatabaseSchema } from "../models/mongose.schema";
 
-class DatabaseManager {
+export class DatabaseManager {
 
   private mongoDatabaseClient!: MongoClient;
   private config!: typeof DatabaseManagerConfig
@@ -13,10 +13,10 @@ class DatabaseManager {
 
   public static COLLECTIONS = {
     USERS_COLLECTION: 'usersCollection',
-    CHAT_COLLECTION: 'chatCollection' 
+    CHAT_COLLECTION: 'chatCollection'
   } as const;
 
-  constructor(){
+  constructor() {
     this.init();
   };
 
@@ -30,12 +30,12 @@ class DatabaseManager {
     return await this.database.collection<Schema>(DatabaseManager.COLLECTIONS[collectionName]);
   };
 
-  public async isUserExist(userName: string): Promise<boolean>{
+  public async isUserExist(userName: string): Promise<boolean> {
     const collection = await this.getCollection("USERS_COLLECTION");
     return await collection.findOne({ userName: userName }) !== null;
   };
 
-  public async getUser(userName: string): Promise<null | UserDatabaseSchema>{
+  public async getUser(userName: string): Promise<null | UserDatabaseSchema> {
     const collection = await this.getCollection<UserDatabaseSchema>("USERS_COLLECTION");
     return await collection.findOne({ userName: userName });
   }
@@ -46,21 +46,21 @@ class DatabaseManager {
   }
 
   public async getAllUsers(): Promise<string[]> {
-    
+
     const collection = await this.getCollection<UserDatabaseSchema>("USERS_COLLECTION");
 
     const cursorData = collection.find();
-    
+
     let result = [];
 
-    for await (const doc of cursorData){
+    for await (const doc of cursorData) {
       result.push(doc.userName);
     }
 
     return result;
   }
 
-  public async getAllMesseges(userName: string): Promise<ChatDatabaseSchema[]>{
+  public async getAllMesseges(userName: string): Promise<ChatDatabaseSchema[]> {
     const collection = await this.getCollection<ChatDatabaseSchema>("CHAT_COLLECTION");
 
     const cursorData = await collection.find({
@@ -69,21 +69,21 @@ class DatabaseManager {
 
     let data = [];
 
-    for await (const doc of cursorData){
+    for await (const doc of cursorData) {
       data.push(doc);
     }
 
     return data;
   }
 
-  public async saveMessage(data: ConversationData): Promise<void>{
+  public async saveMessage(data: ConversationData): Promise<void> {
     const collection = await this.getCollection<ChatDatabaseSchema>("CHAT_COLLECTION");
     const cursorData = await collection.find({
       members: [data.from, data.to]
     });
     const cursorLength = await this.countCursorData(cursorData);
-    
-    if(cursorLength === 0){
+
+    if (cursorLength === 0) {
       this.addNewChatRecord(data);
       return;
     };
@@ -91,15 +91,17 @@ class DatabaseManager {
     collection.updateOne({
       members: [data.from, data.to]
     }, {
-      $push: {"messages": {
-        sender: data.from,
-        message: data.message,
-        timestamp: data.timestamp,
-      }}
+      $push: {
+        "messages": {
+          sender: data.from,
+          message: data.message,
+          timestamp: data.timestamp,
+        }
+      }
     });
   }
 
-  private async addNewChatRecord(data: ConversationData): Promise<void>{
+  private async addNewChatRecord(data: ConversationData): Promise<void> {
     const collection = await this.getCollection<ChatDatabaseSchema>("CHAT_COLLECTION");
     const record: ChatDatabaseSchema = {
       _id: new ObjectId(),
@@ -115,15 +117,15 @@ class DatabaseManager {
     await collection.insertOne(record);
   }
 
-  private async countCursorData(data: FindCursor): Promise<number>{
+  private async countCursorData(data: FindCursor): Promise<number> {
     let counter = 0;
-    for await(const doc of data){
+    for await (const doc of data) {
       counter++;
     }
     return counter;
   }
 
-  public async getUserChatHistory(userName:string){
+  public async getUserChatHistory(userName: string) {
     const chatHistory = await this.getAllMesseges(userName);
     let result: ChatInitData[] = [];
 
