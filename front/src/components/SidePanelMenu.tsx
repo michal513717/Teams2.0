@@ -1,7 +1,6 @@
-import { useChatStorage } from "@/stores/chatStorage"
-import { Box, Button, CircularProgress, ListItem } from "@mui/material"
+import { Box, Button, CircularProgress } from "@mui/material"
 import UserCard from "./userCard";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { useChat } from "@/hooks/useChat";
 import { useLogin } from "@/hooks/useLogin";
 import { ChatContext, ChatContextType } from "@/context/ChatContext";

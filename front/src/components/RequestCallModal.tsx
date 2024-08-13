@@ -2,22 +2,20 @@ import { useVideoStore } from "./../stores/videoStorage"
 import { Modal, Box, Button } from "@mui/material"
 import { useCallback, useContext } from "react";
 import { VideoContext, VideoContextType } from "./../context/VideoCallContext";
+import { useSocketStore } from "@/stores/socketStorage";
 
 export const RequestCallModal = () => {
 
-  const { isRequestCallModalOpen, callerUserName, setIsVideoModalOpen, setIsRequestCallModalOpen } = useVideoStore();
-  const { callAnswerMade, peerConnection } = useContext(VideoContext) as VideoContextType;
+  const { isRequestCallModalOpen, callerUserName, setIsVideoModalOpen } = useVideoStore();
+  const { offer } = useContext(VideoContext) as VideoContextType;
+  const { socket } = useSocketStore();
 
   const handleResponse = useCallback((status: boolean) => {
     if(status === false) return;
 
     setIsVideoModalOpen(true);
 
-    setIsRequestCallModalOpen(false);
-
-    callAnswerMade(callerUserName!);
-
-  },[status, peerConnection, callerUserName]);
+  },[status, socket, offer]);
 
   return (
     <Modal

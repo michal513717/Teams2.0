@@ -10,12 +10,12 @@ export const VideoModal = () => {
 
   const { isVideoModalOpen, isRequestCallModalOpen } = useVideoStore();
   const { selectedUserChat } = useChatStorage();
-  const { callUser, peerConnection } = useContext(VideoContext) as VideoContextType;
+  const { callUser, peerConnection, callAnswerMade, isSecondCall } = useContext(VideoContext) as VideoContextType;
 
   useEffect(() => {
     
     if(isVideoModalOpen === false) return;
-
+    
     setLocalVideo();
 
   }, [isVideoModalOpen, isRequestCallModalOpen]);
@@ -28,16 +28,28 @@ export const VideoModal = () => {
 
     setLocalStream(stream);
 
-    if(isRequestCallModalOpen === true) return;
-    
-    callUser(selectedUserChat as string);
-    
-  },[selectedUserChat, isRequestCallModalOpen]);
+    if(isRequestCallModalOpen === true){
+
+      if(isSecondCall === false){
+        callAnswerMade();
+      }
+
+      return;
+    }
+
+    callUser(selectedUserChat!);
+  },[peerConnection, selectedUserChat, isRequestCallModalOpen, callAnswerMade, isSecondCall]);
 
   const addToPeerConnection = useCallback((stream: MediaStream) =>{
     stream.getTracks().forEach(track => {
       peerConnection.addTrack(track, stream);
     });
+  }, [peerConnection]);
+
+  useEffect(() => {
+    peerConnection.ontrack = function ({ streams: [stream] }) {
+      setRemoteStream(stream);
+    };
   }, [peerConnection]);
 
   return (
@@ -55,6 +67,14 @@ export const VideoModal = () => {
           }} />
         )}
 
+        {remoteStream && (
+          <video autoPlay className="video-call" ref={video => {
+            if(video){
+              video.srcObject = remoteStream
+            }
+          }} />
+        )}
+        <video autoPlay className="video-call" id="remote"/>
       </div>
     </Modal>
   )
