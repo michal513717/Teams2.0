@@ -47,7 +47,7 @@ export const VideoModal = () => {
   }, [peerConnection]);
 
   useEffect(() => {
-    peerConnection.ontrack = function ({ streams: [stream] }) {
+    peerConnection.ontrack = ({ streams: [stream] }) => {
       setRemoteStream(stream);
     };
   }, [peerConnection]);

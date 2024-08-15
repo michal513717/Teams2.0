@@ -1,7 +1,6 @@
 import * as log4js from "log4js";
 import { Logger } from "../models/common.models";
 
-//TODO discuss whether it should be singleton or class with static methods
 class LoggerHelper {
 
   constructor() {
@@ -25,6 +24,6 @@ class LoggerHelper {
   }
 }
 
-var instance = new LoggerHelper();
+const instance = new LoggerHelper();
 
 export default instance;
