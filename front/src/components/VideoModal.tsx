@@ -24,7 +24,8 @@ export const VideoModal = () => {
     peerConnection,
     callAnswerMade,
     resetVideoContext,
-    isSecondCall
+    isSecondCall,
+    endCall
   } = useContext(VideoContext) as VideoContextType;
 
   useEffect(() => {
@@ -98,6 +99,8 @@ export const VideoModal = () => {
 
   const resetVideo = useCallback(() => {
 
+    if(isVideoModalOpen === true) return;
+
     console.info("Reset Video modal");
 
     if (localStream !== null) {
@@ -117,12 +120,13 @@ export const VideoModal = () => {
     setIsCallAccepted(null);
     setIsVideoModalOpen(false);
     setIsRequestCallModalOpen(false);
-  }, [localStream, remoteStream]);
+  }, [localStream, remoteStream, isVideoModalOpen]);
 
   const resetAll = useCallback(() => {
+    endCall(selectedUserChat!);
     resetVideo();
     resetVideoContext();
-  }, []);
+  }, [selectedUserChat]);
 
   return (
     <Modal
@@ -131,7 +135,7 @@ export const VideoModal = () => {
       aria-describedby="modal-modal-description"
     >
       <div className="modal-style">
-        <Box position={"absolute"} right={'20px'} top={"20px"} >
+        <Box position={"absolute"} right={'20px'} top={"20px"} zIndex={99} >
           <IconButton onClick={resetAll}>
             <CloseIcon/>
           </IconButton>

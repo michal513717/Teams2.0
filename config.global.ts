@@ -4,6 +4,7 @@ export const GLOBAL_CONFIG = {
     CALL_USER: 'call-user',
     SEND_PRIVATE_MESSAGE: 'private-message',
     END_CALL: 'end-call',
+    USER_END_CALL: 'user-end-call',
     USER_DISCONNECT: 'disconnect',
     ANSWER_MADE: 'answer-made',
     CALL_MADE: 'call-made',

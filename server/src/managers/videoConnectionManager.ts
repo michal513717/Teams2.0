@@ -48,13 +48,19 @@ export class VideoConnectionManager {
         userName: socket.userName,
         isCallAccepted: data.isCallAccepted
       });
-    });
+    }); 
   }
 
   //TODO specify types
   public setupCloseConnection(socket: Socket & any): void {
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.END_CALL, (data: any) => {
 
+      const receivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
+
+      socket.to(receivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.USER_END_CALL, {
+        socket: socket.id,
+        userName: socket.userName
+      })
     })
   }
 }

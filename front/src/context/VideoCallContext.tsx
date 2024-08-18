@@ -10,6 +10,7 @@ export type VideoContextType = {
   offer: RTCSessionDescription | null;
   isSecondCall:boolean;
   resetVideoContext: () => void;
+  endCall: (userName: string) => void;
   callUser: (userName: string) => void;
   callAnswerMade: (isCallAccepted: boolean) => void;
 };
@@ -28,7 +29,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [offer, setOffer] = useState<RTCSessionDescription | null>(null);
   const [callerUserName, setCallerUserName ] = useState<string>('');
   const [isSecondCall, setIsSecondCall] = useState<boolean>(false);
-  const { setIsRequestCallModalOpen, setIsCallAccepted } = useVideoStore();
+  const { setIsRequestCallModalOpen, setIsCallAccepted, setIsVideoModalOpen } = useVideoStore();
   const { userName } = useAuthStore();
   const { socket } = useSocketStore();
 
@@ -37,8 +38,9 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, async (data) => {
 
+      //TODO replace this variable
       counter++;
-      console.log(data)
+
       setCallerUserName(data.userName);
     
       setOffer(data.offer);
@@ -54,8 +56,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     });
 
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, async(data: Socket & any) => {
-      console.log("answer made");
-      console.log(data.isCallAccepted)
+
       setIsCallAccepted(data.isCallAccepted);
 
       if(data.isCallAccepted === false) return;
@@ -67,11 +68,14 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         setIsAlreadyCalling(true);
       }
     });
+
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.USER_END_CALL, async (data: Socket & any) => {
+      resetVideoContext();
+    });
+
   }, [socket, isSecondCall, peerConnection, isAlreadyCalling]);
 
   const callUser = useCallback(async (userName: string, isSecondCall: boolean = false) => {
-
-    console.log("call user - " + userName);
 
     if (socket === null) {
       console.warn("Socket is null, can't call user");
@@ -89,18 +93,16 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }, [socket, userName, peerConnection]);
 
   const callAnswerMade = useCallback(async(isCallAccepted: boolean, secondOffer?: RTCSessionDescriptionInit) => {
-    console.log("answer made")
+
     if(socket === null){
       console.warn("Socket is null, can't call user");
       return;
     };
-    console.log(secondOffer)
-    console.log(offer)
+
+    // TODO fix this else if or replace
     if(typeof secondOffer !== "undefined"){
-      console.log('ff')
       await peerConnection.setRemoteDescription(new RTCSessionDescription(secondOffer));
     } else if(offer !== null){
-      console.log('fff')
       await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
     }
 
@@ -115,6 +117,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     })
   }, [offer, socket, peerConnection, callerUserName]);
 
+
   const resetVideoContext = useCallback(() => {
     
     counter = 0;
@@ -124,11 +127,23 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     setCallerUserName('');
     setIsCallAccepted(null);
     setIsAlreadyCalling(false);
+    setIsVideoModalOpen(false);
     setIsRequestCallModalOpen(false);
   }, []);
 
+  const endCall = useCallback((userName: string) => {
+    if(socket === null){
+      console.warn("Socket is undefined");
+      return;
+    }
+
+    socket.emit(GLOBAL_CONFIG.SOCKET_EVENTS.END_CALL, {
+      to: userName
+    });
+  }, [socket]);
+
   return (
-    <VideoContext.Provider value={{ offer, callUser, callAnswerMade, peerConnection, isSecondCall, resetVideoContext }}>
+    <VideoContext.Provider value={{ offer, callUser, callAnswerMade, peerConnection, isSecondCall, resetVideoContext, endCall }}>
       {children}
     </VideoContext.Provider>
   );
