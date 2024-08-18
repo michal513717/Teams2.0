@@ -1,12 +1,6 @@
-import { useAuthStore } from "@/stores/authStorage";
 import { CONFIG } from "@/utils/config";
 import axios from "axios";
-import {
-  setAccessToken,
-  setRefreshToken,
-} from "@/stores/localStorage";
 import { useLogin } from "./useLogin";
-
 
 export const useRegister = () => {
   const { loginUser } = useLogin();
@@ -22,8 +16,7 @@ export const useRegister = () => {
         CONFIG.SERVER_URL + CONFIG.END_POINTS.REGISTER_ROUTE,
         data
       );
-      const loginStatus = await loginUser(userName, password);
-      return loginStatus;
+      return await loginUser(userName, password);
     } catch (error: any) {
       console.error("Registration failed:", error);
       return error.response?.status || 500;

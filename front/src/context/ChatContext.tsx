@@ -6,40 +6,8 @@ import { CONFIG } from "@/utils/config";
 import { useAuthStore } from "@/stores/authStorage";
 import { GLOBAL_CONFIG } from "./../../../config.global";
 import { useSocketStore } from "@/stores/socketStorage";
+import { ChatUser, Message, UserStatus } from "@/type/common.types";
 
-
-//TODO fix types
-//TODO move to other file
-
-export interface ChatUser {
-  userName: string;
-  connected: boolean;
-}
-
-interface UserStatus {
-  userName: string;
-  connected: boolean;
-}
-
-export interface Message {
-  from: string;
-  to: string;
-  content: string;
-  timestamp: string;
-}
-
-export type ChatHistory = {
-  time: Date;
-  message: string;
-  sender: string;
-}
-
-export type ChatHistoryData = {
-  from: string;
-  message: string;
-  to: string;
-  timestamp: string;
-}
 
 export interface ChatContextType {
   chatUsers: ChatUser[];
@@ -102,7 +70,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       console.log("Connected to WebSocket server");
     });
 
-    newSocket.on(GLOBAL_CONFIG.SOCKET_EVENTS.INIT_CHATS, (chatHistory: ChatHistoryData[]) => {
+    newSocket.on(GLOBAL_CONFIG.SOCKET_EVENTS.INIT_CHATS, (chatHistory: Message[]) => {
 
       const formattedMessages = chatHistory.map((msg) => ({
         from: msg.from,
@@ -114,7 +82,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     });
 
     
-    newSocket.on(GLOBAL_CONFIG.SOCKET_EVENTS.PRIVATE_MESSAGE, (message: ChatHistoryData) => {
+    newSocket.on(GLOBAL_CONFIG.SOCKET_EVENTS.PRIVATE_MESSAGE, (message: Message) => {
       const formattedMessage = {
         from: message.from,
         to: message.to,

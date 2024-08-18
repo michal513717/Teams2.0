@@ -8,7 +8,7 @@ import { useVideoStore } from "@/stores/videoStorage";
 export type VideoContextType = {
   peerConnection: RTCPeerConnection;
   offer: RTCSessionDescription | null;
-  isSecondCall:boolean;
+  isSecondCall: boolean;
   resetVideoContext: () => void;
   endCall: (userName: string) => void;
   callUser: (userName: string) => void;
@@ -27,7 +27,7 @@ export const VideoContext = createContext<VideoContextType | null>(null);
 const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAlreadyCalling, setIsAlreadyCalling] = useState<boolean>(false);
   const [offer, setOffer] = useState<RTCSessionDescription | null>(null);
-  const [callerUserName, setCallerUserName ] = useState<string>('');
+  const [callerUserName, setCallerUserName] = useState<string>('');
   const [isSecondCall, setIsSecondCall] = useState<boolean>(false);
   const { setIsRequestCallModalOpen, setIsCallAccepted, setIsVideoModalOpen } = useVideoStore();
   const { userName } = useAuthStore();
@@ -36,16 +36,17 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   useEffect(() => {
     if (socket === null) return;
 
+    //TODO fix types
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, async (data) => {
 
       //TODO replace this variable
       counter++;
 
       setCallerUserName(data.userName);
-    
+
       setOffer(data.offer);
 
-      if(counter === 2){
+      if (counter === 2) {
 
         setIsSecondCall(true);
         callAnswerMade(true, data.offer);
@@ -55,54 +56,56 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       setIsRequestCallModalOpen(true);
     });
 
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, async(data: Socket & any) => {
+    //TODO fix types
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, async (data: Socket & any) => {
 
       setIsCallAccepted(data.isCallAccepted);
 
-      if(data.isCallAccepted === false) return;
+      if (data.isCallAccepted === false) return;
 
       await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
 
-      if(isAlreadyCalling === false){
-        await callUser(data.userName, true);
+      if (isAlreadyCalling === false) {
+        await callUser(data.userName);
         setIsAlreadyCalling(true);
       }
     });
-
+  
+    //TODO fix types
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.USER_END_CALL, async (data: Socket & any) => {
       resetVideoContext();
     });
 
   }, [socket, isSecondCall, peerConnection, isAlreadyCalling]);
 
-  const callUser = useCallback(async (userName: string, isSecondCall: boolean = false) => {
+  const callUser = useCallback(async (userName: string) => {
 
     if (socket === null) {
       console.warn("Socket is null, can't call user");
       return;
     }
 
-    const offer = await peerConnection.createOffer(); 
+    const offer = await peerConnection.createOffer();
 
     await peerConnection.setLocalDescription(new RTCSessionDescription(offer));
-    
+
     socket.emit(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_USER, {
       offer,
       to: userName,
     });
   }, [socket, userName, peerConnection]);
 
-  const callAnswerMade = useCallback(async(isCallAccepted: boolean, secondOffer?: RTCSessionDescriptionInit) => {
+  const callAnswerMade = useCallback(async (isCallAccepted: boolean, secondOffer?: RTCSessionDescriptionInit) => {
 
-    if(socket === null){
+    if (socket === null) {
       console.warn("Socket is null, can't call user");
       return;
     };
 
     // TODO fix this else if or replace
-    if(typeof secondOffer !== "undefined"){
+    if (typeof secondOffer !== "undefined") {
       await peerConnection.setRemoteDescription(new RTCSessionDescription(secondOffer));
-    } else if(offer !== null){
+    } else if (offer !== null) {
       await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
     }
 
@@ -119,7 +122,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
 
   const resetVideoContext = useCallback(() => {
-    
+
     counter = 0;
 
     setOffer(null);
@@ -132,7 +135,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }, []);
 
   const endCall = useCallback((userName: string) => {
-    if(socket === null){
+    if (socket === null) {
       console.warn("Socket is undefined");
       return;
     }
