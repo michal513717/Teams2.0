@@ -1,4 +1,4 @@
-import { ChatUser, Message, UserStatus } from "./common.types";
+import { Message, UserStatus } from "./common.types";
 import { Socket } from "socket.io-client";
 
 // TODO clean unused stores

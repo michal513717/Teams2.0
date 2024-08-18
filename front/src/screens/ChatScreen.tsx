@@ -21,6 +21,7 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
     }
   };
 
+  //TODO maybe something there is wrong
   const filteredMessages = messages.filter(msg => {
     return chat_user === userName ? msg.from === userName && msg.to === userName : msg.to === chat_user || msg.from === chat_user;
   });
