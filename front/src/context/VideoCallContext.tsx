@@ -1,140 +1,149 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from "react";
-import { getAccessToken } from "@/stores/localStorage";
-import { CONFIG } from "@/utils/config";
+import { Socket } from "socket.io-client";
 import { useAuthStore } from "@/stores/authStorage";
 import { GLOBAL_CONFIG } from "./../../../config.global";
 import { useSocketStore } from "@/stores/socketStorage";
-import { useChatStorage } from "@/stores/chatStorage";
 import { useVideoStore } from "@/stores/videoStorage";
 
 export type VideoContextType = {
-  callUser: (userName: string) => void;
   peerConnection: RTCPeerConnection;
-}
+  offer: RTCSessionDescription | null;
+  isSecondCall:boolean;
+  resetVideoContext: () => void;
+  endCall: (userName: string) => void;
+  callUser: (userName: string) => void;
+  callAnswerMade: (isCallAccepted: boolean) => void;
+};
 
 const { RTCPeerConnection } = window;
 
 const peerConnection = new RTCPeerConnection();
 
+//TODO celan up this variable
+let counter = 0;
+
 export const VideoContext = createContext<VideoContextType | null>(null);
 
 const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAlreadyCalling, setIsAlreadyCalling] = useState<boolean>(false);
-
+  const [offer, setOffer] = useState<RTCSessionDescription | null>(null);
+  const [callerUserName, setCallerUserName ] = useState<string>('');
+  const [isSecondCall, setIsSecondCall] = useState<boolean>(false);
+  const { setIsRequestCallModalOpen, setIsCallAccepted, setIsVideoModalOpen } = useVideoStore();
   const { userName } = useAuthStore();
   const { socket } = useSocketStore();
-  const { chatUsers } = useChatStorage();
-
 
   useEffect(() => {
-
     if (socket === null) return;
 
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, async (data) => {
-      console.log("call made")
 
-      //TODO implement call answer
-      // const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      // let a = document.getElementById('local')
-      // //@ts-ignore
-      // a.srcObject = stream;
-      // stream.getTracks().forEach(track => {
-      //   peerConnection.addTrack(track, stream);
-      // });
+      //TODO replace this variable
+      counter++;
 
-      await peerConnection.setRemoteDescription(
-        new RTCSessionDescription(data.offer)
-      );
+      setCallerUserName(data.userName);
+    
+      setOffer(data.offer);
 
-      const answer = await peerConnection.createAnswer();
-      await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
+      if(counter === 2){
 
-      callAnswerMade(answer, data.userName);
+        setIsSecondCall(true);
+        callAnswerMade(true, data.offer);
+        return;
+      }
+
+      setIsRequestCallModalOpen(true);
     });
 
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, async (data) => {
-      console.log("answer made")
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, async(data: Socket & any) => {
 
-      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer))
+      setIsCallAccepted(data.isCallAccepted);
 
-      if (isAlreadyCalling === false) {
+      if(data.isCallAccepted === false) return;
+
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+
+      if(isAlreadyCalling === false){
         await callUser(data.userName, true);
         setIsAlreadyCalling(true);
       }
     });
 
-    socket.on("disconnect", () => {
-      // TODO remove user
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.USER_END_CALL, async (data: Socket & any) => {
+      resetVideoContext();
     });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, [socket, isAlreadyCalling]);
+  }, [socket, isSecondCall, peerConnection, isAlreadyCalling]);
 
   const callUser = useCallback(async (userName: string, isSecondCall: boolean = false) => {
-    console.log("call user - " + userName)
-
-    let isUserExist = false;
 
     if (socket === null) {
       console.warn("Socket is null, can't call user");
-      return;
-    }
-
-    for (const chatUser of chatUsers) {
-      if (chatUser.userName === userName) {
-        if (chatUser.connected === false) {
-          console.warn("User is offline");
-          return;
-        };
-
-        isUserExist = true;
-
-        break;
-      }
-    }
-
-    if (isUserExist === false && isSecondCall === false) {
-      console.warn("User doesn't exist")
       return;
     }
 
     const offer = await peerConnection.createOffer(); 
 
     await peerConnection.setLocalDescription(new RTCSessionDescription(offer));
-
-    socket.emit("call-user", {
+    
+    socket.emit(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_USER, {
       offer,
       to: userName,
     });
-  }, [socket, userName, chatUsers]);
+  }, [socket, userName, peerConnection]);
 
-  const callAnswerMade = useCallback((answer: RTCSessionDescriptionInit, to: string) => {
-    if (socket === null) {
+  const callAnswerMade = useCallback(async(isCallAccepted: boolean, secondOffer?: RTCSessionDescriptionInit) => {
+
+    if(socket === null){
       console.warn("Socket is null, can't call user");
       return;
+    };
+
+    // TODO fix this else if or replace
+    if(typeof secondOffer !== "undefined"){
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(secondOffer));
+    } else if(offer !== null){
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
     }
+
+    const answer = await peerConnection.createAnswer();
+
+    await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
 
     socket.emit(GLOBAL_CONFIG.SOCKET_EVENTS.MAKE_ANSWER, {
       answer,
-      to
+      to: callerUserName,
+      isCallAccepted
     })
+  }, [offer, socket, peerConnection, callerUserName]);
 
-  }, [socket])
 
+  const resetVideoContext = useCallback(() => {
+    
+    counter = 0;
 
-  peerConnection.ontrack = function ({ streams: [stream] }) {
-    console.log("rmoet")
-    const remoteVideo = document.getElementById("remote");
-    if (remoteVideo) {
-      //@ts-ignore
-      remoteVideo.srcObject = stream;
+    setOffer(null);
+    setIsSecondCall(false);
+    setCallerUserName('');
+    setIsCallAccepted(null);
+    setIsAlreadyCalling(false);
+    setIsVideoModalOpen(false);
+    setIsRequestCallModalOpen(false);
+  }, []);
+
+  const endCall = useCallback((userName: string) => {
+    if(socket === null){
+      console.warn("Socket is undefined");
+      return;
     }
-  };
+
+    socket.emit(GLOBAL_CONFIG.SOCKET_EVENTS.END_CALL, {
+      to: userName
+    });
+  }, [socket]);
 
   return (
-    <VideoContext.Provider value={{ callUser, peerConnection }}>
+    <VideoContext.Provider value={{ offer, callUser, callAnswerMade, peerConnection, isSecondCall, resetVideoContext, endCall }}>
       {children}
     </VideoContext.Provider>
   );

@@ -1,6 +1,8 @@
 import { ChatUser, Message, UserStatus } from "./common.types";
 import { Socket } from "socket.io-client";
 
+// TODO clean unused stores
+
 export type AuthStore = {
   isAuthenticated: boolean;
   userName: null | string;
@@ -23,8 +25,14 @@ export type ChatStore = {
 };
 
 export type VideoStore = {
-  isModalOpen: boolean;
-  setIsModalOpen: (value: boolean) => void;
+  isVideoModalOpen: boolean;
+  isRequestCallModalOpen: boolean;
+  callerUserName: string | null;
+  isCallAccepted: boolean | null;
+  setIsCallAccepted: (value: boolean | null) => void;
+  setCallerUserName: (value: string | null) => void;
+  setIsVideoModalOpen: (value: boolean) => void;
+  setIsRequestCallModalOpen: (value: boolean) => void;
 }
 
 export type SocketStore = {

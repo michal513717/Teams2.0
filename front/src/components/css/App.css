@@ -134,6 +134,24 @@ body{
   flex-direction: row;
 }
 
+.request-call-modal-style{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40vw;
+  height: 20vh;
+  background-color: white;
+  border: 1px solid #000;
+  padding: 4px;
+  display: flex;
+  border-radius: 2.5%;
+  flex-direction: column;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
 .video-call{
   width: 50%;
 }

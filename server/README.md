@@ -1,6 +1,6 @@
-#ARZ-Server
+#Teams 2.0 Server side
 
-ARZ-Server side v0.0.1
+Teams 2.0 Server side v0.0.1
 
 ## Installation
 

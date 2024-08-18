@@ -11,7 +11,7 @@ type Props = { chat_user: string | undefined };
 const ChatScreen: React.FC<Props> = ({ chat_user }) => {
   const [input, setInput] = useState<string>("");
   const { userName } = useAuthStore();
-  const { setIsModalOpen } = useVideoStore();
+  const { setIsVideoModalOpen } = useVideoStore();
   const { messages, sendMessage } = useContext(ChatContext) as ChatContextType;
 
   const handleSendMessage = () => {
@@ -26,7 +26,7 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
   });
 
   const handleCallUser = () => {
-    setIsModalOpen(true);
+    setIsVideoModalOpen(true);
   }
 
   return (

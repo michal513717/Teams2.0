@@ -1,7 +1,6 @@
 import { Application } from "express";
 import { getLogger } from "log4js";
 
-//TODO discuss whether it should be singleton or class with static methods
 export class Debugger {
 
   public static debugRequest = async (application: Application) => {

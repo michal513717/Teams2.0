@@ -8,6 +8,7 @@ import ChatProvider from "@/context/ChatContext";
 import { useChatStorage } from "@/stores/chatStorage";
 import { useChat } from "@/hooks/useChat";
 import VideoProvider from "@/context/VideoCallContext";
+import { RequestCallModal } from "@/components/RequestCallModal";
 
 const MainScreen: React.FC = () => {
 
@@ -33,6 +34,7 @@ const MainScreen: React.FC = () => {
         <VideoProvider>
           <ChatScreen chat_user={selectedUserChat ?? ""} />
           <VideoModal />
+          <RequestCallModal/>
         </VideoProvider>
       </Box>
     </ChatProvider>

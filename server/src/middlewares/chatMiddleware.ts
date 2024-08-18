@@ -1,7 +1,7 @@
 import { sessionManager } from "../managers/sessionManager";
 import { ChatSocketType, NextFunction } from "../models/common.models";
 import { InvalidTokenError } from "../utils/errors";
-import { Authenticator } from "./aunthenicator";
+import { Authenticator } from "./authenticator";
 
 export class ChatMiddlewareHandler {
   public static verifyConnection = async (socket: ChatSocketType, next: NextFunction) => {
@@ -33,7 +33,7 @@ export class ChatMiddlewareHandler {
 
       next();
     } catch (error) {
-      console.log(error)
+      console.warn(error)
       console.warn('error chat Middleware');
     }
   }

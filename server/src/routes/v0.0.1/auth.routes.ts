@@ -2,7 +2,7 @@ import type { Application } from "express";
 import { CommonRoutesConfig } from "../../common/common.routes.config";
 import express from "express";
 import { loginController, registerController, tokenCheckController } from "../../controllers/auth.controllers";
-import { Authenticator } from "../../middlewares/aunthenicator";
+import { Authenticator } from "../../middlewares/authenticator";
 
 export class AuthRouter extends CommonRoutesConfig {
 

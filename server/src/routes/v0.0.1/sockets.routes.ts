@@ -65,6 +65,8 @@ export class SocketRoutes extends CommonRoutesConfig {
     this.videoConnectionManager.setupCallUser(socket);
 
     this.videoConnectionManager.setupMakeAnswer(socket);
+
+    this.videoConnectionManager.setupCloseConnection(socket);
   }
 
   private configureChatConnection = async (socket: Socket & any) => {

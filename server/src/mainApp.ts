@@ -1,20 +1,18 @@
-import bodyParser from "body-parser";
-import { APPLICATION_CONFIG } from "./utils/configs/applicationConfig";
 import { CommonRoutesConfig } from "./common/common.routes.config";
+import { APPLICATION_CONFIG } from "./utils/configs/applicationConfig";
+import cacheControl from "express-cache-controller";
+import bodyParser from "body-parser";
 import { NotValidRoutes } from "./routes/v0.0.1/notValid.routes";
 import { ExampleRoute } from "./routes/v0.0.1/example.routes";
 import { SocketRoutes } from "./routes/v0.0.1/sockets.routes";
 import { HttpServer, Logger } from "./models/common.models";
 import { AuthRouter } from "./routes/v0.0.1/auth.routes";
-import { databaseManager } from "./managers/databaseManager";
+import { InformationRoute } from "./routes/v0.0.1/information.routes";
 import express, { Application } from "express";
 import { Debugger } from "./utils/debugger";
 import LoggerHelper from "./utils/logger";
 import * as http from "http";
 import cors from "cors";
-import { InformationRoute } from "./routes/v0.0.1/information.routes";
-import cacheControl from "express-cache-controller";
-// import { ChatSockets } from "./routes/v0.0.1/chatSocket.routes";
 
 export class MainApp {
 
@@ -31,7 +29,7 @@ export class MainApp {
   private init(): void {
 
     this.initLogger();
-    this.initApplcationConfig();
+    this.initApplicationConfig();
     this.initApplicationAndServer();
     this.initBasicDebug();
     this.initRoutes();
@@ -43,7 +41,7 @@ export class MainApp {
     this.logger = LoggerHelper.getLogger("MainApp");
   }
 
-  private initApplcationConfig(): void {
+  private initApplicationConfig(): void {
 
     this.config = APPLICATION_CONFIG;
   }
@@ -69,7 +67,7 @@ export class MainApp {
   }
 
   //* in this function we declare add another routes.
-  //* Decalre of notValidRoutes should be at the end.
+  //* Declare of notValidRoutes should be at the end.
   private initRoutes(): void {
 
     const application = this.application;

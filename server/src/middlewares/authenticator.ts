@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthroizationTokenManager } from '../managers/tokenManager';
+import { AuthorizationTokenManager } from '../managers/tokenManager';
 import { ChatSocketType } from '../models/common.models';
 import { InvalidTokenError } from '../utils/errors';
 
@@ -13,7 +13,7 @@ export class Authenticator {
         throw new Error("Token Not Found");
       }
       const token = authHeader.split(' ')[1];
-      const payload = AuthroizationTokenManager.verifyToken(token);
+      const payload = AuthorizationTokenManager.verifyToken(token);
 
       if (payload == null) {
         throw new Error("Invalid Token");
@@ -35,7 +35,7 @@ export class Authenticator {
       return next(new InvalidTokenError());
     }
 
-    const parsedToken = AuthroizationTokenManager.verifyToken(token);
+    const parsedToken = AuthorizationTokenManager.verifyToken(token);
 
     if(parsedToken === null){
       return next(new InvalidTokenError());

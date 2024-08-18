@@ -14,21 +14,15 @@ const App: React.FC = () => {
 
   useEffect(() => {
     checkAuthStatus();
-  }, []);
-
-  // useEffect(() => {
-  //   checkAuthStatus();
-  // }, [isAuthenticated]);
+  }, [isAuthenticated]);
 
   if (isAuthenticated === null) {
     return <p>loading</p>;
   }
   return (
-    <>
-      <Suspense fallback={<p>loading</p>}>
-        <RouterProvider router={isAuthenticated ? mainRouter : authRouter} />
-      </Suspense>
-    </>
+    <Suspense fallback={<p>loading</p>}>
+      <RouterProvider router={isAuthenticated ? mainRouter : authRouter} />
+    </Suspense>
   );
 }
 
