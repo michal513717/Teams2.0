@@ -6,12 +6,17 @@ import { useSocketStore } from "@/stores/socketStorage";
 
 export const RequestCallModal = () => {
 
-  const { isRequestCallModalOpen, callerUserName, setIsVideoModalOpen } = useVideoStore();
-  const { offer } = useContext(VideoContext) as VideoContextType;
+  const { isRequestCallModalOpen, callerUserName, setIsVideoModalOpen, setIsRequestCallModalOpen } = useVideoStore();
+  const { offer, callAnswerMade } = useContext(VideoContext) as VideoContextType;
   const { socket } = useSocketStore();
 
   const handleResponse = useCallback((status: boolean) => {
-    if(status === false) return;
+
+    if(status === false){
+      callAnswerMade(false);
+      setIsRequestCallModalOpen(false);
+      return;
+    }
 
     setIsVideoModalOpen(true);
 

@@ -18,6 +18,7 @@ export class VideoConnectionManager {
     this.sessionManager = sessionManager;
   }
 
+  //TODO specify types
   public setupCallUser(socket: Socket & any): void {
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_USER, (data: any) => {
 
@@ -33,6 +34,7 @@ export class VideoConnectionManager {
     });
   }
 
+  //TODO specify types
   public setupMakeAnswer(socket: Socket & any): void {
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.MAKE_ANSWER, (data: any) => {
 
@@ -43,9 +45,17 @@ export class VideoConnectionManager {
       socket.to(receivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, {
         socket: socket.id,
         answer: data.answer,
-        userName: socket.userName
+        userName: socket.userName,
+        isCallAccepted: data.isCallAccepted
       });
     });
+  }
+
+  //TODO specify types
+  public setupCloseConnection(socket: Socket & any): void {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.END_CALL, (data: any) => {
+
+    })
   }
 }
 

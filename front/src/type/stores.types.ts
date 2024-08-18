@@ -28,6 +28,8 @@ export type VideoStore = {
   isVideoModalOpen: boolean;
   isRequestCallModalOpen: boolean;
   callerUserName: string | null;
+  isCallAccepted: boolean | null;
+  setIsCallAccepted: (value: boolean | null) => void;
   setCallerUserName: (value: string | null) => void;
   setIsVideoModalOpen: (value: boolean) => void;
   setIsRequestCallModalOpen: (value: boolean) => void;

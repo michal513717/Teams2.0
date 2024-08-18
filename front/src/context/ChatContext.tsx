@@ -7,6 +7,10 @@ import { useAuthStore } from "@/stores/authStorage";
 import { GLOBAL_CONFIG } from "./../../../config.global";
 import { useSocketStore } from "@/stores/socketStorage";
 
+
+//TODO fix types
+//TODO move to other file
+
 export interface ChatUser {
   userName: string;
   connected: boolean;
@@ -82,6 +86,10 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
     fetchUsers();
 
+    //TODO specify types eg.
+    // please note that the types are reversed
+    // const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io();
+
     const newSocket = io(CONFIG.SERVER_URL, {
       auth: {
         token: accessToken
@@ -105,9 +113,8 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       setMessages(formattedMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()));
     });
 
-
-    //TODO import from config
-    newSocket.on("private-message", (message: ChatHistoryData) => {
+    
+    newSocket.on(GLOBAL_CONFIG.SOCKET_EVENTS.PRIVATE_MESSAGE, (message: ChatHistoryData) => {
       const formattedMessage = {
         from: message.from,
         to: message.to,
@@ -164,8 +171,8 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     if (socket) {
       if (userName) {
         const timestamp = new Date().toISOString();
-        //TODO import from config
-        socket.emit("private-message", { content: message, to, timestamp });
+        
+        socket.emit(GLOBAL_CONFIG.SOCKET_EVENTS.PRIVATE_MESSAGE, { content: message, to, timestamp });
         setMessages((prevMessages) => {
           const updatedMessages = [...prevMessages, { from: userName, to, content: message, timestamp }];
           return updatedMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
