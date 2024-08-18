@@ -109,7 +109,6 @@ body {
 .message-input {
   display: flex;
   padding: 10px;
-  background-color: #a5f6ec;
   border-top: 1px solid #ddd;
 }
 
