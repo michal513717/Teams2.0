@@ -4,6 +4,7 @@ import MongoLocalClient from "../database/index";
 import { DatabaseManagerConfig } from "../utils/configs/databaseManagerConfig";
 import { MongoDatabase } from "../models/common.models";
 import { ChatDatabaseSchema, ChatInitData, ConversationData, UserDatabaseSchema } from "../models/mongose.schema";
+import ManagersCollection from "./managersCollection";
 
 export class DatabaseManager {
 
@@ -144,5 +145,3 @@ export class DatabaseManager {
     return result;
   }
 };
-
-export const databaseManager = new DatabaseManager();

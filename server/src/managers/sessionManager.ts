@@ -47,5 +47,3 @@ export class SessionManager {
     return null;
   }
 }
-
-export const sessionManager = new SessionManager();

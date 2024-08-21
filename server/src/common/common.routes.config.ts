@@ -35,6 +35,7 @@ export abstract class CommonRoutesConfig {
       httpServer: typeof server === "undefined" ? null : server
     });
 
+    this.configureControllers();
     this.configureRoute();
   }
 
@@ -52,6 +53,8 @@ export abstract class CommonRoutesConfig {
   public getApp(): Application {
     return this.app;
   }
+
+  abstract configureControllers(): void;
 
   abstract configureRoute(): Application;
 }

@@ -1,8 +1,9 @@
-import { VideoConnectionManager, videoConnectionManager } from "../../managers/videoConnectionManager";
-import { ChatConnectionManager, chatConnectionManager } from "../../managers/chatConnectionManager";
+import { VideoConnectionManager } from "../../managers/videoConnectionManager";
+import { ChatConnectionManager } from "../../managers/chatConnectionManager";
 import { CommonRoutesInitData, HttpServer } from "../../models/common.models";
 import { CommonRoutesConfig } from "../../common/common.routes.config";
 import { ChatMiddlewareHandler } from "../../middlewares/chatMiddleware";
+import ManagersCollection from "../../managers/managersCollection";
 import { Application } from "express";
 import { Server, Socket } from "socket.io";
 
@@ -12,6 +13,7 @@ export class SocketRoutes extends CommonRoutesConfig {
   private serverIO!: Server;
   private videoConnectionManager!: VideoConnectionManager;
   private chatConnectionManager!: ChatConnectionManager;
+  private chatMiddlewareHandler!: ChatMiddlewareHandler;
 
   constructor(app: Application, server: HttpServer) {
 
@@ -26,14 +28,19 @@ export class SocketRoutes extends CommonRoutesConfig {
     }
 
     this.initManagers();
+    this.initHandlers();
 
     super.init(initData);
   }
 
+  private initHandlers(): void {
+    this.chatMiddlewareHandler = new ChatMiddlewareHandler();
+  }
+
   private initManagers(): void {
 
-    this.videoConnectionManager = videoConnectionManager;
-    this.chatConnectionManager = chatConnectionManager;
+    this.videoConnectionManager = ManagersCollection.getManagerById<VideoConnectionManager>("videoConnectionManager");
+    this.chatConnectionManager = ManagersCollection.getManagerById<ChatConnectionManager>("chatConnectionManager");
   }
 
   private initSocketServer(httpServer: HttpServer): void {
@@ -44,11 +51,13 @@ export class SocketRoutes extends CommonRoutesConfig {
     });
   }
 
-  public configureRoute(): Application {
+  public override configureControllers(): void {}
 
-    this.serverIO.use(ChatMiddlewareHandler.verifyConnection);
+  public override configureRoute(): Application {
 
-    this.serverIO.use(ChatMiddlewareHandler.createSession);
+    this.serverIO.use(this.chatMiddlewareHandler.verifyConnection);
+
+    this.serverIO.use(this.chatMiddlewareHandler.createSession);
 
     this.serverIO.on('connection', socket => {
 

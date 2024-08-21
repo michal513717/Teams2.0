@@ -1,8 +1,8 @@
 import { Socket } from "socket.io";
 import { GLOBAL_CONFIG } from "../../../config.global";
-import { sessionManager, SessionManager } from "./sessionManager";
-import { databaseManager, DatabaseManager } from "./databaseManager";
-
+import { SessionManager } from "./sessionManager";
+import { DatabaseManager } from "./databaseManager";
+import ManagersCollection from "./managersCollection";
 
 export class ChatConnectionManager {
 
@@ -18,8 +18,8 @@ export class ChatConnectionManager {
   }
 
   private setupManagers(): void {
-    this.sessionManager = sessionManager;
-    this.databaseManager = databaseManager;
+    this.sessionManager = ManagersCollection.getManagerById<SessionManager>('sessionManager');
+    this.databaseManager = ManagersCollection.getManagerById<DatabaseManager>('databaseManager');
   }
 
   public async setupPrivateMessage(socket: Socket & any): Promise<void> {
@@ -50,7 +50,7 @@ export class ChatConnectionManager {
         timestamp: new Date(),
       };
 
-      databaseManager.saveMessage(messageData);
+      this.databaseManager.saveMessage(messageData);
 
       socket.to(receivedID).to(socket.userID)
         .emit(GLOBAL_CONFIG.SOCKET_EVENTS.SEND_PRIVATE_MESSAGE, {
@@ -67,5 +67,3 @@ export class ChatConnectionManager {
     });
   }
 }
-
-export const chatConnectionManager = new ChatConnectionManager();

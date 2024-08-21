@@ -1,6 +1,7 @@
 import { Socket } from "socket.io";
-import { sessionManager, SessionManager } from "./sessionManager";
+import { SessionManager } from "./sessionManager";
 import { GLOBAL_CONFIG } from "../../../config.global";
+import ManagersCollection from "./managersCollection";
 
 export class VideoConnectionManager {
 
@@ -15,7 +16,7 @@ export class VideoConnectionManager {
   }
 
   private setupManagers(): void {
-    this.sessionManager = sessionManager;
+    this.sessionManager = ManagersCollection.getManagerById<SessionManager>("sessionManager");
   }
 
   //TODO specify types
@@ -64,5 +65,3 @@ export class VideoConnectionManager {
     })
   }
 }
-
-export const videoConnectionManager = new VideoConnectionManager();

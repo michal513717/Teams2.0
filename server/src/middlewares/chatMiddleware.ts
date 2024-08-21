@@ -1,10 +1,22 @@
-import { sessionManager } from "../managers/sessionManager";
+import { SessionManager } from "../managers/sessionManager";
 import { ChatSocketType, NextFunction } from "../models/common.models";
 import { InvalidTokenError } from "../utils/errors";
 import { Authenticator } from "./authenticator";
+import ManagerCollection from "../managers/managersCollection";
 
 export class ChatMiddlewareHandler {
-  public static verifyConnection = async (socket: ChatSocketType, next: NextFunction) => {
+
+  private sessionManager!: SessionManager;
+
+  constructor(){
+    this.initManagers();
+  }
+
+  private initManagers(): void{
+    this.sessionManager = ManagerCollection.getManagerById<SessionManager>('sessionManager');
+  }
+
+  public verifyConnection = async (socket: ChatSocketType, next: NextFunction) => {
     try {
       let userToken = socket.handshake.auth.token as string;
 
@@ -18,13 +30,13 @@ export class ChatMiddlewareHandler {
 
       const parsedToken = await Authenticator.verifyTokenSocketMiddleware(socket, next);
 
-      if (sessionManager.isUserConnectedByUserName(parsedToken.userName) === true) {
+      if (this.sessionManager.isUserConnectedByUserName(parsedToken.userName) === true) {
 
-        const prevSessionId = sessionManager.findSocketIdByUserName(parsedToken.userName) as string;;
-        const prevSession = sessionManager.findSession(prevSessionId);
+        const prevSessionId = this.sessionManager.findSocketIdByUserName(parsedToken.userName) as string;;
+        const prevSession = this.sessionManager.findSession(prevSessionId);
 
         if (prevSession !== null) {
-          sessionManager.removeSession(prevSession.socketId);
+          this.sessionManager.removeSession(prevSession.socketId);
         }
       }
 
@@ -38,9 +50,9 @@ export class ChatMiddlewareHandler {
     }
   }
 
-  public static createSession = async (socket: ChatSocketType, next: NextFunction) => {
+  public createSession = async (socket: ChatSocketType, next: NextFunction) => {
     try {
-      sessionManager.saveSession(socket.sessionID, {
+      this.sessionManager.saveSession(socket.sessionID, {
         socketId: socket.id,
         userName: socket.userName,
         connected: true

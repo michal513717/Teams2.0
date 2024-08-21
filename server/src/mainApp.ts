@@ -2,6 +2,8 @@ import { CommonRoutesConfig } from "./common/common.routes.config";
 import { APPLICATION_CONFIG } from "./utils/configs/applicationConfig";
 import cacheControl from "express-cache-controller";
 import bodyParser from "body-parser";
+import ManagersCollection from "./managers/managersCollection";
+import ControllersCollection from "./managers/controllersCollection";
 import { NotValidRoutes } from "./routes/v0.0.1/notValid.routes";
 import { ExampleRoute } from "./routes/v0.0.1/example.routes";
 import { SocketRoutes } from "./routes/v0.0.1/sockets.routes";
@@ -11,8 +13,16 @@ import { InformationRoute } from "./routes/v0.0.1/information.routes";
 import express, { Application } from "express";
 import { Debugger } from "./utils/debugger";
 import LoggerHelper from "./utils/logger";
+import MongoLocalClient from "./database/index";
 import * as http from "http";
 import cors from "cors";
+import { SessionManager } from "./managers/sessionManager";
+import { DatabaseManager } from "./managers/databaseManager";
+import { VideoConnectionManager } from "./managers/videoConnectionManager";
+import { ChatConnectionManager } from "./managers/chatConnectionManager";
+import { InformationController } from "./controllers/information.controllers";
+import { ExampleController } from "./controllers/exampleRouter.controller";
+import { AuthController } from "./controllers/auth.controllers";
 
 export class MainApp {
 
@@ -21,6 +31,7 @@ export class MainApp {
   private routes!: CommonRoutesConfig[];
   private server!: HttpServer;
   private logger!: Logger;
+  private aaa = MongoLocalClient;
 
   constructor() {
     this.init();
@@ -28,6 +39,8 @@ export class MainApp {
 
   private init(): void {
 
+    this.initManagers();
+    this.initControllers();
     this.initLogger();
     this.initApplicationConfig();
     this.initApplicationAndServer();
@@ -35,6 +48,22 @@ export class MainApp {
     this.initRoutes();
 
     this.startServer();
+    this.setupCloseListeners();
+  }
+
+  private initManagers(): void{
+
+    ManagersCollection.addManager("databaseManager", new DatabaseManager());
+    ManagersCollection.addManager("sessionManager", new SessionManager());
+    ManagersCollection.addManager("chatConnectionManager", new ChatConnectionManager());
+    ManagersCollection.addManager("videoConnectionManager", new VideoConnectionManager());
+  }
+
+  private initControllers(): void{
+
+    ControllersCollection.addController("authController", new AuthController());
+    ControllersCollection.addController("exampleController", new ExampleController());
+    ControllersCollection.addController("informationController", new InformationController());
   }
 
   private initLogger(): void {
@@ -96,5 +125,30 @@ export class MainApp {
 
       this.logger.info(runningMessage);
     });
+  }
+
+  private setupCloseListeners(): void {
+
+    this.logger.info('Start executing closing process');
+    // console.log(MongoLocalClient)
+    // for(const signal of APPLICATION_CONFIG.EXIT_SIGNALS){
+    //   console.log('0')
+    //   process.on(signal as any, async() => {
+    //     console.log('1')
+    //     console.log(signal)
+        
+    //     if(this.aaa.isMongoClientActive() === true){
+    //       console.log('2')
+    //       await MongoLocalClient.closeClientConnection();
+    //     }
+    //   })
+    // }
+
+
+    this.server.on('close', async () => {
+      if(MongoLocalClient.isMongoClientActive() === true){
+        await MongoLocalClient.closeClientConnection();
+      }
+    })
   }
 }
