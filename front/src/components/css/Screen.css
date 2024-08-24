@@ -100,10 +100,10 @@ body {
 }
 
 .message-container.from {
-  align-items: flex-start;
+  align-items: flex-end;
 }
 .message-container.to {
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
 .message-input {
