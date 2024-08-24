@@ -4,7 +4,7 @@ import MongoLocalClient from "../database/index";
 import { DatabaseManagerConfig } from "../utils/configs/databaseManagerConfig";
 import { MongoDatabase } from "../models/common.models";
 import { ChatDatabaseSchema, ChatInitData, ConversationData, UserDatabaseSchema } from "../models/mongose.schema";
-import { Manager } from "../common/manager";
+import { Manager } from "../common/common.manager.config";
 
 export class DatabaseManager extends Manager {
 

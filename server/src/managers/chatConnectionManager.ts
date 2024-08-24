@@ -3,7 +3,7 @@ import { GLOBAL_CONFIG } from "../../../config.global";
 import { SessionManager } from "./sessionManager";
 import { DatabaseManager } from "./databaseManager";
 import ManagersCollection from "./managersCollection";
-import { Manager } from "../common/manager";
+import { Manager } from "../common/common.manager.config";
 import LoggerHelper from "../utils/logger";
 import { Logger } from "../models/common.models";
 

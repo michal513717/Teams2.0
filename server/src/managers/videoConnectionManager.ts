@@ -2,7 +2,7 @@ import { Socket } from "socket.io";
 import { SessionManager } from "./sessionManager";
 import { GLOBAL_CONFIG } from "../../../config.global";
 import ManagersCollection from "./managersCollection";
-import { Manager } from "../common/manager";
+import { Manager } from "../common/common.manager.config";
 
 export class VideoConnectionManager extends Manager{
 

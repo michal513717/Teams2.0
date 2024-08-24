@@ -9,7 +9,7 @@ import { ObjectId } from "mongodb";
 import { ZodError } from "zod";
 import { UnauthorizedError, UserNotFoundError, UsernameTakenError } from "../utils/errors";
 import { AuthorizationTokenManager } from "../managers/tokenManager";
-import { Manager } from "../common/manager";
+import { Manager } from "../common/common.manager.config";
 
 export class AuthController extends Manager { 
 

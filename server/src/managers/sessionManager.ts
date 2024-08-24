@@ -1,4 +1,4 @@
-import { Manager } from "../common/manager";
+import { Manager } from "../common/common.manager.config";
 import { SessionRecord } from "../models/common.models";
 
 export class SessionManager extends Manager{

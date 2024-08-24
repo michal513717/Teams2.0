@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { CommonRoutesConfig } from "../common/common.routes.config";
 import ManagerCollection from "../managers/managersCollection";
 import { DatabaseManager } from "../managers/databaseManager";
-import { Manager } from "../common/manager";
+import { Manager } from "../common/common.manager.config";
 
 export class InformationController extends Manager{
 
