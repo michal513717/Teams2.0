@@ -9,13 +9,16 @@ import { ObjectId } from "mongodb";
 import { ZodError } from "zod";
 import { UnauthorizedError, UserNotFoundError, UsernameTakenError } from "../utils/errors";
 import { AuthorizationTokenManager } from "../managers/tokenManager";
+import { Manager } from "../common/manager";
 
-export class AuthController { 
+export class AuthController extends Manager { 
 
   private databaseManager!: DatabaseManager;
 
-  constructor(){
+  protected async init(): Promise<void>{
+    this.setupLogger("AuthController");
     this.initManagers();
+    this.finishSetup();
   }
 
   private initManagers(): void{

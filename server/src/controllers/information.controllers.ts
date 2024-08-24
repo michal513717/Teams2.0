@@ -2,13 +2,16 @@ import type { NextFunction, Request, Response } from "express";
 import { CommonRoutesConfig } from "../common/common.routes.config";
 import ManagerCollection from "../managers/managersCollection";
 import { DatabaseManager } from "../managers/databaseManager";
+import { Manager } from "../common/manager";
 
-export class InformationController {
+export class InformationController extends Manager{
 
   private databaseManager!: DatabaseManager;
 
-  constructor(){
+  protected async init(): Promise<void>{
+    this.setupLogger("InformationController");
     this.initManagers();
+    this.finishSetup();
   }
 
   private initManagers(): void{

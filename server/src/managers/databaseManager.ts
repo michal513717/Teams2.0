@@ -4,9 +4,9 @@ import MongoLocalClient from "../database/index";
 import { DatabaseManagerConfig } from "../utils/configs/databaseManagerConfig";
 import { MongoDatabase } from "../models/common.models";
 import { ChatDatabaseSchema, ChatInitData, ConversationData, UserDatabaseSchema } from "../models/mongose.schema";
-import ManagersCollection from "./managersCollection";
+import { Manager } from "../common/manager";
 
-export class DatabaseManager {
+export class DatabaseManager extends Manager {
 
   private mongoDatabaseClient!: MongoClient;
   private config!: typeof DatabaseManagerConfig
@@ -17,14 +17,12 @@ export class DatabaseManager {
     CHAT_COLLECTION: 'chatCollection'
   } as const;
 
-  constructor() {
-    this.init();
-  };
-
-  private async init(): Promise<void> {
+  protected async init(): Promise<void> {
+    this.setupLogger("DatabaseManager");
     this.config = DatabaseManagerConfig;
     this.mongoDatabaseClient = await MongoLocalClient.getClient();
     this.database = this.mongoDatabaseClient.db(this.config.DATABASE_NAME);
+    this.finishSetup();
   };
 
   private async getCollection<Schema extends Document>(collectionName: keyof typeof DatabaseManager.COLLECTIONS): Promise<Collection<Schema>> {

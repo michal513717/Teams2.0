@@ -2,17 +2,16 @@ import { Socket } from "socket.io";
 import { SessionManager } from "./sessionManager";
 import { GLOBAL_CONFIG } from "../../../config.global";
 import ManagersCollection from "./managersCollection";
+import { Manager } from "../common/manager";
 
-export class VideoConnectionManager {
+export class VideoConnectionManager extends Manager{
 
   private sessionManager!: SessionManager;
 
-  constructor() {
-    this.init();
-  }
-
-  private init(): void {
+  protected async init(): Promise<void> {
+    this.setupLogger("VideoConnectionManager");
     this.setupManagers();
+    this.finishSetup();
   }
 
   private setupManagers(): void {

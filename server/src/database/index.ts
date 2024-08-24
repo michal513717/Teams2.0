@@ -14,24 +14,29 @@ class MongoLocalClient {
   }
 
   private async initClient(): Promise<MongoClient> {
+    try {
+      
+      this.logger.trace("Start client connection");
 
-    this.logger.info("Start client connection");
+      const client = await new MongoClient(MONGO_DB_URI, {
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: true,
+          deprecationErrors: true,
+        }
+      });
 
-    const client = await new MongoClient(MONGO_DB_URI, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      }
-    });
+      await client.connect();
 
-    await client.connect();
-
-    this.mongoClient = client;
-    
-    this.logger.info("Client connection success");
-    
-    return client;
+      this.mongoClient = client;
+      
+      this.logger.trace("Client connection success");
+      
+      return client;
+    } catch (error) {
+      this.logger.fatal("Error during connecting to MongoDB");
+      process.exit();
+    }
   }
 
   public async getClient(): Promise<MongoClient> {

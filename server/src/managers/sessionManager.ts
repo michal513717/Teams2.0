@@ -1,10 +1,13 @@
+import { Manager } from "../common/manager";
 import { SessionRecord } from "../models/common.models";
 
-export class SessionManager {
-  private sessions: Record<string, SessionRecord>;
+export class SessionManager extends Manager{
+  private sessions!: Record<string, SessionRecord>;
 
-  constructor() {
+  protected async init(): Promise<void>{
+    this.setupLogger("SessionManager");
     this.sessions = {};
+    this.finishSetup();
   }
 
   public findSession(id: string): SessionRecord | null {

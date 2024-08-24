@@ -31,16 +31,17 @@ export class MainApp {
   private routes!: CommonRoutesConfig[];
   private server!: HttpServer;
   private logger!: Logger;
-  private aaa = MongoLocalClient;
 
-  constructor() {
-    this.init();
+  static async createClassInstance() {
+    const mainApp = new MainApp();
+    await mainApp.init();
+    return mainApp;
   }
 
-  private init(): void {
-
-    this.initManagers();
-    this.initControllers();
+  protected async init(): Promise<void> {
+    
+    await this.initManagers();
+    await this.initControllers();
     this.initLogger();
     this.initApplicationConfig();
     this.initApplicationAndServer();
@@ -51,19 +52,19 @@ export class MainApp {
     this.setupCloseListeners();
   }
 
-  private initManagers(): void{
+  private async initManagers(): Promise<void> {
 
-    ManagersCollection.addManager("databaseManager", new DatabaseManager());
-    ManagersCollection.addManager("sessionManager", new SessionManager());
-    ManagersCollection.addManager("chatConnectionManager", new ChatConnectionManager());
-    ManagersCollection.addManager("videoConnectionManager", new VideoConnectionManager());
+    ManagersCollection.addManager("databaseManager", await DatabaseManager.createClassInstance());
+    ManagersCollection.addManager("sessionManager", await SessionManager.createClassInstance());
+    ManagersCollection.addManager("chatConnectionManager", await ChatConnectionManager.createClassInstance());
+    ManagersCollection.addManager("videoConnectionManager", await VideoConnectionManager.createClassInstance());
   }
 
-  private initControllers(): void{
+  private async initControllers(): Promise<void> {
 
-    ControllersCollection.addController("authController", new AuthController());
+    ControllersCollection.addController("authController", await AuthController.createClassInstance());
     ControllersCollection.addController("exampleController", new ExampleController());
-    ControllersCollection.addController("informationController", new InformationController());
+    ControllersCollection.addController("informationController", await InformationController.createClassInstance());
   }
 
   private initLogger(): void {
@@ -129,24 +130,19 @@ export class MainApp {
 
   private setupCloseListeners(): void {
 
-    this.logger.info('Start executing closing process');
-    // console.log(MongoLocalClient)
-    // for(const signal of APPLICATION_CONFIG.EXIT_SIGNALS){
-    //   console.log('0')
-    //   process.on(signal as any, async() => {
-    //     console.log('1')
-    //     console.log(signal)
-        
-    //     if(this.aaa.isMongoClientActive() === true){
-    //       console.log('2')
-    //       await MongoLocalClient.closeClientConnection();
-    //     }
-    //   })
-    // }
+    this.logger.info('Setup listeners of executing closing process');
+    
+    for (const signal of APPLICATION_CONFIG.EXIT_SIGNALS) {
+      process.on(signal as any, async () => {
+        if (MongoLocalClient.isMongoClientActive() === true) {
+          await MongoLocalClient.closeClientConnection();
+        }
+      })
+    }
 
 
     this.server.on('close', async () => {
-      if(MongoLocalClient.isMongoClientActive() === true){
+      if (MongoLocalClient.isMongoClientActive() === true) {
         await MongoLocalClient.closeClientConnection();
       }
     })

@@ -3,18 +3,19 @@ import { GLOBAL_CONFIG } from "../../../config.global";
 import { SessionManager } from "./sessionManager";
 import { DatabaseManager } from "./databaseManager";
 import ManagersCollection from "./managersCollection";
+import { Manager } from "../common/manager";
+import LoggerHelper from "../utils/logger";
+import { Logger } from "../models/common.models";
 
-export class ChatConnectionManager {
+export class ChatConnectionManager extends Manager{
 
   private sessionManager!: SessionManager
   private databaseManager!: DatabaseManager;
 
-  constructor() {
-    this.init();
-  }
-
-  private init(): void {
+  protected async init(): Promise<void> {
+    this.setupLogger("ChatConnectionManager");
     this.setupManagers();
+    this.finishSetup();
   }
 
   private setupManagers(): void {
