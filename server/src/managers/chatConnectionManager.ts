@@ -1,25 +1,26 @@
 import { Socket } from "socket.io";
 import { GLOBAL_CONFIG } from "../../../config.global";
-import { sessionManager, SessionManager } from "./sessionManager";
-import { databaseManager, DatabaseManager } from "./databaseManager";
+import { SessionManager } from "./sessionManager";
+import { DatabaseManager } from "./databaseManager";
+import ManagersCollection from "./managersCollection";
+import { Manager } from "../common/common.manager.config";
+import LoggerHelper from "../utils/logger";
+import { Logger } from "../models/common.models";
 
-
-export class ChatConnectionManager {
+export class ChatConnectionManager extends Manager{
 
   private sessionManager!: SessionManager
   private databaseManager!: DatabaseManager;
 
-  constructor() {
-    this.init();
-  }
-
-  private init(): void {
+  protected async init(): Promise<void> {
+    this.setupLogger("ChatConnectionManager");
     this.setupManagers();
+    this.finishSetup();
   }
 
   private setupManagers(): void {
-    this.sessionManager = sessionManager;
-    this.databaseManager = databaseManager;
+    this.sessionManager = ManagersCollection.getManagerById<SessionManager>('sessionManager');
+    this.databaseManager = ManagersCollection.getManagerById<DatabaseManager>('databaseManager');
   }
 
   public async setupPrivateMessage(socket: Socket & any): Promise<void> {
@@ -50,7 +51,7 @@ export class ChatConnectionManager {
         timestamp: new Date(),
       };
 
-      databaseManager.saveMessage(messageData);
+      this.databaseManager.saveMessage(messageData);
 
       socket.to(receivedID).to(socket.userID)
         .emit(GLOBAL_CONFIG.SOCKET_EVENTS.SEND_PRIVATE_MESSAGE, {
@@ -67,5 +68,3 @@ export class ChatConnectionManager {
     });
   }
 }
-
-export const chatConnectionManager = new ChatConnectionManager();

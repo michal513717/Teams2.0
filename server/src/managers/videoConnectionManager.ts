@@ -1,21 +1,21 @@
 import { Socket } from "socket.io";
-import { sessionManager, SessionManager } from "./sessionManager";
+import { SessionManager } from "./sessionManager";
 import { GLOBAL_CONFIG } from "../../../config.global";
+import ManagersCollection from "./managersCollection";
+import { Manager } from "../common/common.manager.config";
 
-export class VideoConnectionManager {
+export class VideoConnectionManager extends Manager{
 
   private sessionManager!: SessionManager;
 
-  constructor() {
-    this.init();
-  }
-
-  private init(): void {
+  protected async init(): Promise<void> {
+    this.setupLogger("VideoConnectionManager");
     this.setupManagers();
+    this.finishSetup();
   }
 
   private setupManagers(): void {
-    this.sessionManager = sessionManager;
+    this.sessionManager = ManagersCollection.getManagerById<SessionManager>("sessionManager");
   }
 
   //TODO specify types
@@ -64,5 +64,3 @@ export class VideoConnectionManager {
     })
   }
 }
-
-export const videoConnectionManager = new VideoConnectionManager();
