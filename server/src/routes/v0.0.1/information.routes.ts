@@ -1,7 +1,7 @@
 import { InformationController } from "../../controllers/information.controllers";
 import { CommonRoutesConfig } from "../../common/common.routes.config";
 import { Authenticator } from "../../middlewares/authenticator";
-import ControllersManager from "../../managers/controllersCollection";
+import ControllersManager from "../../controllers/controllersCollection";
 import type { Application } from "express";
 import express from "express";
 

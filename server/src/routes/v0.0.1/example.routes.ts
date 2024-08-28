@@ -1,6 +1,6 @@
 import { ExampleController } from "../../controllers/exampleRouter.controller";
 import { CommonRoutesConfig } from "../../common/common.routes.config";
-import ControllersCollection from "../../managers/controllersCollection"
+import ControllersCollection from "../../controllers/controllersCollection"
 import type { Application } from "express";
 import express from "express";
 
