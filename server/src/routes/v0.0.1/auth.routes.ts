@@ -3,7 +3,7 @@ import { CommonRoutesConfig } from "../../common/common.routes.config";
 import express from "express";
 import { AuthController } from "../../controllers/auth.controllers";
 import { Authenticator } from "../../middlewares/authenticator";
-import ControllersCollection from "../../managers/controllersCollection"
+import ControllersCollection from "../../controllers/controllersCollection"
 
 export class AuthRouter extends CommonRoutesConfig {
 

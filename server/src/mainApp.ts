@@ -3,7 +3,7 @@ import { APPLICATION_CONFIG } from "./utils/configs/applicationConfig";
 import cacheControl from "express-cache-controller";
 import bodyParser from "body-parser";
 import ManagersCollection from "./managers/managersCollection";
-import ControllersCollection from "./managers/controllersCollection";
+import ControllersCollection from "./controllers/controllersCollection";
 import { NotValidRoutes } from "./routes/v0.0.1/notValid.routes";
 import { ExampleRoute } from "./routes/v0.0.1/example.routes";
 import { SocketRoutes } from "./routes/v0.0.1/sockets.routes";
