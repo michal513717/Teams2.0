@@ -1,9 +1,8 @@
 import { Button } from "@mui/material";
 import CallIcon from "@mui/icons-material/Call";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { ChatContext, ChatContextType } from "@/context/ChatContext";
 import { useAuthStore } from "@/stores/authStorage";
-import { useVideo, VideoContext, VideoContextType } from "@/context/VideoCallContext";
 import { useVideoStore } from "@/stores/videoStorage";
 
 type Props = { chat_user: string | undefined };
@@ -13,6 +12,8 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
   const { userName } = useAuthStore();
   const { setIsVideoModalOpen } = useVideoStore();
   const { messages, sendMessage } = useContext(ChatContext) as ChatContextType;
+  
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleSendMessage = () => {
     if (input.trim() && chat_user) {
@@ -21,17 +22,24 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
     }
   };
 
-  //TODO maybe something there is wrong
   const filteredMessages = messages.filter(msg => {
     return chat_user === userName ? msg.from === userName && msg.to === userName : msg.to === chat_user || msg.from === chat_user;
   });
 
   const handleCallUser = () => {
     setIsVideoModalOpen(true);
-  }
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [filteredMessages]);
 
   return (
-    <div className="chat-container" >
+    <div className="chat-container">
       <div className="chat-header">
         <div>{chat_user}</div>
         <Button variant="contained" startIcon={<CallIcon />} onClick={handleCallUser}>
@@ -47,6 +55,7 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
       <div className="message-input">
         <input
