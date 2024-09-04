@@ -4,16 +4,7 @@ import { useAuthStore } from "@/stores/authStorage";
 import { GLOBAL_CONFIG } from "./../../../config.global";
 import { useSocketStore } from "@/stores/socketStorage";
 import { useVideoStore } from "@/stores/videoStorage";
-
-export type VideoContextType = {
-  peerConnection: RTCPeerConnection;
-  offer: RTCSessionDescription | null;
-  isSecondCall: boolean;
-  resetVideoContext: () => void;
-  endCall: (userName: string) => void;
-  callUser: (userName: string) => void;
-  callAnswerMade: (isCallAccepted: boolean) => void;
-};
+import { VideoContextType, CallUserData, MakeAnswerData, CloseConnectionData } from "@/type/video.types";
 
 const { RTCPeerConnection } = window;
 
@@ -34,12 +25,11 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   useEffect(() => {
     if (socket === null) return;
 
-    //TODO fix types
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, async (data) => {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, async (data: CallUserData) => {
 
       setCallerUserName(data.userName);
 
-      setOffer(data.offer);
+      setOffer(new RTCSessionDescription(data.offer));
 
       setCallCounter(prevCounter => prevCounter + 1);
 
@@ -53,8 +43,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       setIsRequestCallModalOpen(true);
     });
 
-    //TODO fix types
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, async (data: Socket & any) => {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, async (data: MakeAnswerData) => {
 
       setIsCallAccepted(data.isCallAccepted);
 
@@ -68,8 +57,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       }
     });
   
-    //TODO fix types
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.USER_END_CALL, async (data: Socket & any) => {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.USER_END_CALL, async (data: CloseConnectionData) => {
       resetVideoContext();
     });
 

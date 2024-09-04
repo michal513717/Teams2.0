@@ -3,6 +3,28 @@ import { SessionManager } from "./sessionManager";
 import { GLOBAL_CONFIG } from "../../../config.global";
 import ManagersCollection from "./managersCollection";
 import { Manager } from "../common/common.manager.config";
+import { ChatSocketType } from "../models/common.models";
+
+type CallUserData = {
+  offer: {
+    sdp: string;
+    type: 'offer';
+  };
+  to: string;
+}
+
+type MakeAnswerData = {
+  answer: {
+    sdp: string;
+    type: 'answer';
+  };
+  isCallAccepted: boolean;
+  to: string;
+}
+
+type CloseConnectionData = {
+  to: string;
+}
 
 export class VideoConnectionManager extends Manager{
 
@@ -18,9 +40,8 @@ export class VideoConnectionManager extends Manager{
     this.sessionManager = ManagersCollection.getManagerById<SessionManager>("sessionManager");
   }
 
-  //TODO specify types
-  public setupCallUser(socket: Socket & any): void {
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_USER, (data: any) => {
+  public setupCallUser(socket: ChatSocketType): void {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_USER, (data: CallUserData) => {
 
       const receivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
@@ -37,9 +58,8 @@ export class VideoConnectionManager extends Manager{
     });
   }
 
-  //TODO specify types
-  public setupMakeAnswer(socket: Socket & any): void {
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.MAKE_ANSWER, (data: any) => {
+  public setupMakeAnswer(socket: ChatSocketType): void {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.MAKE_ANSWER, (data: MakeAnswerData) => {
 
       const receivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
@@ -57,9 +77,8 @@ export class VideoConnectionManager extends Manager{
     }); 
   }
 
-  //TODO specify types
-  public setupCloseConnection(socket: Socket & any): void {
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.END_CALL, (data: any) => {
+  public setupCloseConnection(socket: ChatSocketType): void {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.END_CALL, (data: CloseConnectionData) => {
 
       const receivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
