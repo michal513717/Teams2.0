@@ -12,6 +12,7 @@ export const GLOBAL_CONFIG = {
     INIT_CHATS: 'init-chats',
     PRIVATE_MESSAGE: 'private-message',
     USER_CONNECTED: 'user-connected',
+    USER_DISCONNECTED: 'user-disconnected',
     ALL_USERS: 'all-users',
   }
 }

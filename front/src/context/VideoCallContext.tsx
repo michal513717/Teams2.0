@@ -19,9 +19,6 @@ const { RTCPeerConnection } = window;
 
 const peerConnection = new RTCPeerConnection();
 
-//TODO celan up this variable
-let counter = 0;
-
 export const VideoContext = createContext<VideoContextType | null>(null);
 
 const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -29,6 +26,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [offer, setOffer] = useState<RTCSessionDescription | null>(null);
   const [callerUserName, setCallerUserName] = useState<string>('');
   const [isSecondCall, setIsSecondCall] = useState<boolean>(false);
+  const [callCounter, setCallCounter] = useState<number>(0);
   const { setIsRequestCallModalOpen, setIsCallAccepted, setIsVideoModalOpen } = useVideoStore();
   const { userName } = useAuthStore();
   const { socket } = useSocketStore();
@@ -39,14 +37,13 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     //TODO fix types
     socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, async (data) => {
 
-      //TODO replace this variable
-      counter++;
-
       setCallerUserName(data.userName);
 
       setOffer(data.offer);
 
-      if (counter === 2) {
+      setCallCounter(prevCounter => prevCounter + 1);
+
+      if (callCounter === 2) {
 
         setIsSecondCall(true);
         callAnswerMade(true, data.offer);
@@ -76,7 +73,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       resetVideoContext();
     });
 
-  }, [socket, isSecondCall, peerConnection, isAlreadyCalling]);
+  }, [socket, isSecondCall, callCounter, peerConnection, isAlreadyCalling]);
 
   const callUser = useCallback(async (userName: string) => {
 
@@ -123,7 +120,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   const resetVideoContext = useCallback(() => {
 
-    counter = 0;
+    setCallCounter(0);
 
     setOffer(null);
     setIsSecondCall(false);

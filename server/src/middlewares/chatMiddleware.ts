@@ -16,7 +16,7 @@ export class ChatMiddlewareHandler {
     this.sessionManager = ManagerCollection.getManagerById<SessionManager>('sessionManager');
   }
 
-  public verifyConnection = async (socket: ChatSocketType, next: NextFunction) => {
+  public verifyConnection = async (socket: ChatSocketType, next: any) => {
     try {
       let userToken = socket.handshake.auth.token as string;
 

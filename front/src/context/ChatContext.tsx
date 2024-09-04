@@ -95,8 +95,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       });
     });
 
-    //TODO import from config
-    newSocket.on("all-users", (allUsers: UserStatus[]) => {
+    newSocket.on(GLOBAL_CONFIG.SOCKET_EVENTS.ALL_USERS, (allUsers: UserStatus[]) => {
 
       setChatUsers((prevUsers) =>
         prevUsers.map((u) => {
@@ -106,8 +105,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       );
     });
 
-    //TODO import from config
-    newSocket.on("user-connected", (user) => {
+    newSocket.on(GLOBAL_CONFIG.SOCKET_EVENTS.USER_CONNECTED, (user: UserStatus) => {
       const userName = user.userName;
       setChatUsers((prevUsers) =>
         prevUsers.map((u) => {
@@ -116,8 +114,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       );
     });
 
-    //TODO import from config
-    newSocket.on("user-disconnected", (userName) => {
+    newSocket.on(GLOBAL_CONFIG.SOCKET_EVENTS.USER_DISCONNECTED, (userName: string) => {
       setChatUsers((prevUsers) =>
         prevUsers.map((u) => {
           return u.userName === userName ? { ...u, connected: false } : u;
@@ -125,7 +122,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       );
     });
 
-    newSocket.on("disconnect", () => {
+    newSocket.on(GLOBAL_CONFIG.SOCKET_EVENTS.USER_DISCONNECT, () => {
       // removeSessionID();
       // TODO remove user
     });

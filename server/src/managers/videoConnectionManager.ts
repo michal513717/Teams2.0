@@ -24,7 +24,10 @@ export class VideoConnectionManager extends Manager{
 
       const receivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
-      //TODO add error handler if reciverID is null
+      if (!receivedID) {
+        this.logger.error(`Receiver ID is null. Cannot make a call to user: ${data.to}`);
+        return;
+      }
 
       socket.to(receivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, {
         offer: data.offer,
@@ -40,7 +43,10 @@ export class VideoConnectionManager extends Manager{
 
       const receivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
-      //TODO add error handler if reciverID is null
+      if (!receivedID) {
+        this.logger.error(`Receiver ID is null. Cannot send answer to user: ${data.to}`);
+        return;
+      }
 
       socket.to(receivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, {
         socket: socket.id,
