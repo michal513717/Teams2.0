@@ -53,7 +53,9 @@ export class ChatConnectionManager extends Manager{
 
       this.databaseManager.saveMessage(messageData);
 
-      socket.to(receivedID).to(socket.userID)
+      if(receivedID === null) return;
+
+      socket.to(receivedID)
         .emit(GLOBAL_CONFIG.SOCKET_EVENTS.SEND_PRIVATE_MESSAGE, {
           to: to,
           message: content,
