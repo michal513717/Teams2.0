@@ -20,3 +20,7 @@ export type CommonRoutesInitData = {
   version: string
   httpServer: HttpServer | null;
 };
+export type UserStatus = {
+  userName: string;
+  connected: boolean;
+};

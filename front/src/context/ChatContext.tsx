@@ -33,9 +33,10 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
           Authorization: `Bearer ${accessToken}`
         }
       });
-      const users = response.data.result.map((name: string) => ({
-        userName: name,
-        connected: false, // Default status
+
+      const users = response.data.result.map((user: UserStatus) => ({
+        userName: user.userName,
+        connected: user.connected, // Default status
       }));
       setChatUsers(users);
     } catch (error) {
@@ -97,7 +98,6 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
     //TODO import from config
     newSocket.on("all-users", (allUsers: UserStatus[]) => {
-
       setChatUsers((prevUsers) =>
         prevUsers.map((u) => {
           const user = allUsers.find((user) => user.userName === u.userName);

@@ -38,12 +38,17 @@ export class SessionManager extends Manager{
     return this.findSession(socketId) !== null;
   }
 
+  public changeUserStatusToDisconnect(userName: string): void{
+    const sessionId = this.findSocketIdByUserName(userName) as string;
+    this.sessions[sessionId].connected = false;
+  }
+
   public findSocketIdByUserName(userName: string): null | string {
     const sessions = this.findAllSessions();
 
     for (const session of sessions) {
       if (session.userName === userName) {
-        return session.socketId
+        return session.socketId;
       }
     }
 
