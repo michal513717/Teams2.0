@@ -27,9 +27,8 @@ export const VideoContext = createContext<VideoContextType | null>(null);
 const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAlreadyCalling, setIsAlreadyCalling] = useState<boolean>(false);
   const [offer, setOffer] = useState<RTCSessionDescription | null>(null);
-  const [callerUserName, setCallerUserName] = useState<string>('');
   const [isSecondCall, setIsSecondCall] = useState<boolean>(false);
-  const { setIsRequestCallModalOpen, setIsCallAccepted, setIsVideoModalOpen } = useVideoStore();
+  const { setIsRequestCallModalOpen, setIsCallAccepted, setIsVideoModalOpen, callerUserName, setCallerUserName} = useVideoStore();
   const { userName } = useAuthStore();
   const { socket } = useSocketStore();
 
@@ -41,7 +40,7 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
       //TODO replace this variable
       counter++;
-
+  
       setCallerUserName(data.userName);
 
       setOffer(data.offer);

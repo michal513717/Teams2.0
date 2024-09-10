@@ -25,7 +25,7 @@ export class ChatMiddlewareHandler {
       }
 
       if (!userToken) {
-        return next(new InvalidTokenError());
+        return next();
       }
 
       const parsedToken = await Authenticator.verifyTokenSocketMiddleware(socket, next);
