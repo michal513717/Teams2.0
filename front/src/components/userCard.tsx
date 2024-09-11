@@ -1,6 +1,8 @@
+import { ChatContext, ChatContextType } from "@/context/ChatContext";
 import { useAuthStore } from "@/stores/authStorage";
 import { useChatStorage } from "@/stores/chatStorage";
-import { useCallback } from "react";
+import { useCallback, useContext } from "react";
+import MarkUnreadChatAltIcon from '@mui/icons-material/MarkUnreadChatAlt';
 
 interface UserCardProps {
   isActive: boolean;
@@ -9,6 +11,7 @@ interface UserCardProps {
 }
 
 function UserCard({ isActive, userCardName, lastMessage }: UserCardProps) {
+  const { unreadMessages } = useContext(ChatContext) as ChatContextType;
   const { setSelectedUserChat, selectedUserChat } = useChatStorage();
   const { userName } = useAuthStore();
 
@@ -30,6 +33,9 @@ function UserCard({ isActive, userCardName, lastMessage }: UserCardProps) {
         </div>
         <div className="last-message">
           {formattedMessage}
+        </div>
+        <div className= {`toRead ${unreadMessages.includes(userCardName) ? "" : 'hidden' }`}  >
+          <MarkUnreadChatAltIcon/>
         </div>
       </div>
       {/* <div className={`${hasNewMessages} ? "new-messages" : ""`}>!</div> */}
