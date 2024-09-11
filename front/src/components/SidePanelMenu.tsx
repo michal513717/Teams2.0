@@ -9,13 +9,7 @@ import { ChatContext, ChatContextType } from "@/context/ChatContext";
 export const SidePanelMenu = () => {
   const { chatUsers, messages } = useContext(ChatContext) as ChatContextType;
   const { logoutUser } = useLogin();
-  const { fetchUsers, isLoading } = useChat();
-
-  // useEffect(() => {
-  //   if (chatUsers.length === 0) {
-  //     fetchUsers();
-  //   }
-  // }, [chatUsers]);
+  const { isLoading } = useChat();
 
   const getLastMessage = (userName: string): string => {
     const userMessages = messages.filter(
@@ -40,7 +34,7 @@ export const SidePanelMenu = () => {
           chatUsers.map((user, index) => (
             <UserCard
               key={`${user.userName}${index}`}
-              userName={user.userName}
+              userCardName={user.userName}
               isActive={user.connected}
               lastMessage={getLastMessage(user.userName)}
             />

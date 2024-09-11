@@ -133,15 +133,7 @@ export class MainApp {
     this.logger.info('Setup listeners of executing closing process');
     
     for (const signal of APPLICATION_CONFIG.EXIT_SIGNALS) {
-
-      this.logger.info(`Setup listener for ${signal}`);
-
       process.on(signal as any, async () => {
-        console.log('test1');
-        console.log(`Catched ${signal}`);
-        console.log('test2');
-        console.log(MongoLocalClient);
-        console.log('test3')
         if (MongoLocalClient.isMongoClientActive() === true) {
           await MongoLocalClient.closeClientConnection();
         }

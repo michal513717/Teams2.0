@@ -16,7 +16,7 @@ class MongoLocalClient {
   private async initClient(): Promise<MongoClient> {
     try {
       
-      this.logger.trace("Start client connection");
+      this.logger.log("Start client connection");
 
       const client = await new MongoClient(MONGO_DB_URI, {
         serverApi: {
@@ -30,7 +30,7 @@ class MongoLocalClient {
 
       this.mongoClient = client;
       
-      this.logger.trace("Client connection success");
+      this.logger.log("Client connection success");
       
       return client;
     } catch (error) {

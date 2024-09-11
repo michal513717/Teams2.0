@@ -4,6 +4,7 @@ import { CONFIG } from "@/utils/config";
 import axios from "axios";
 import { useAuth } from "./useAuth";
 import { useState } from "react";
+import { UserStatus } from "@/type/common.types";
 
 export const useChat = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -19,9 +20,9 @@ export const useChat = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      const users = response.data.result.map((name: string) => ({
-        userName: name,
-        status: false, // Default status
+      const users = response.data.result.map((user: UserStatus) => ({
+        userName: user.userName,
+        status: user.connected,
       }));
       setChatUsers(users);
     } catch (error) {

@@ -6,6 +6,7 @@ import { ChatMiddlewareHandler } from "../../middlewares/chatMiddleware";
 import ManagersCollection from "../../managers/managersCollection";
 import { Application } from "express";
 import { Server, Socket } from "socket.io";
+import { SessionManager } from "../../managers/sessionManager";
 
 
 export class SocketRoutes extends CommonRoutesConfig {
@@ -14,6 +15,7 @@ export class SocketRoutes extends CommonRoutesConfig {
   private videoConnectionManager!: VideoConnectionManager;
   private chatConnectionManager!: ChatConnectionManager;
   private chatMiddlewareHandler!: ChatMiddlewareHandler;
+  private sessionsManager!: SessionManager;
 
   constructor(app: Application, server: HttpServer) {
 
@@ -41,6 +43,7 @@ export class SocketRoutes extends CommonRoutesConfig {
 
     this.videoConnectionManager = ManagersCollection.getManagerById<VideoConnectionManager>("videoConnectionManager");
     this.chatConnectionManager = ManagersCollection.getManagerById<ChatConnectionManager>("chatConnectionManager");
+    this.sessionsManager = ManagersCollection.getManagerById<SessionManager>("sessionManager");
   }
 
   private initSocketServer(httpServer: HttpServer): void {
@@ -64,12 +67,14 @@ export class SocketRoutes extends CommonRoutesConfig {
       this.configureWebRTCConnection(socket);
 
       this.configureChatConnection(socket);
+
+      this.configureDisconnect(socket);
     });
 
     return this.getApp();
   }
 
-  private configureWebRTCConnection = (socket: Socket) => {
+  private async configureWebRTCConnection (socket: Socket): Promise<void>{
 
     this.videoConnectionManager.setupCallUser(socket);
 
@@ -78,8 +83,15 @@ export class SocketRoutes extends CommonRoutesConfig {
     this.videoConnectionManager.setupCloseConnection(socket);
   }
 
-  private configureChatConnection = async (socket: Socket & any) => {
+  private async configureChatConnection (socket: Socket & any): Promise<void> {
 
     this.chatConnectionManager.setupPrivateMessage(socket);
+  }
+
+  private async configureDisconnect(socket: Socket & any): Promise<void> {
+    
+    socket.on("disconnect", async () => {
+      this.sessionsManager.changeUserStatusToDisconnect(socket.userName);
+    });
   }
 }
