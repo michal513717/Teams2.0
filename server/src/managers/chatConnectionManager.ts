@@ -4,8 +4,7 @@ import { SessionManager } from "./sessionManager";
 import { DatabaseManager } from "./databaseManager";
 import ManagersCollection from "./managersCollection";
 import { Manager } from "../common/common.manager.config";
-import LoggerHelper from "../utils/logger";
-import { Logger } from "../models/common.models";
+import { UnReadMessageSchema } from "../models/mongose.schema";
 
 export class ChatConnectionManager extends Manager{
 
@@ -31,8 +30,10 @@ export class ChatConnectionManager extends Manager{
 
     const allSessions = this.sessionManager.findAllSessions();
 
+    //TODO change variable to const (Config)
     socket.emit("all-users", allSessions);
 
+    //TODO is used? change variable to const (Config)
     socket.broadcast.emit("user-connected", {
       userID: socket.userID,
       userName: socket.userName,
@@ -45,7 +46,7 @@ export class ChatConnectionManager extends Manager{
       const receivedID = this.sessionManager.findSocketIdByUserName(to);
 
       const messageData = {
-        to: to,
+        to,
         message: content,
         from: socket.userName,
         timestamp: new Date(),
@@ -57,17 +58,17 @@ export class ChatConnectionManager extends Manager{
 
       socket.to(receivedID)
         .emit(GLOBAL_CONFIG.SOCKET_EVENTS.SEND_PRIVATE_MESSAGE, {
-          to: to,
+          to,
           message: content,
           from: socket.userName,
           timestamp: new Date(),
         });
     });
 
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.MESSAGE_READ, async ({ from, to }: any) => {
-
-
-      // this.databaseManager.markMessageAsRead()
+    //TODO refactor
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.MESSAGE_READ, async ({ from, to }: UnReadMessageSchema) => {
+      if(from === "" || to === "") return;
+      this.databaseManager.markMessageAsRead({from, to});
     })
 
     socket.on('disconnect', async () => {

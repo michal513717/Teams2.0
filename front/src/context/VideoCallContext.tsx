@@ -8,6 +8,8 @@ import { VideoContextType, CallUserData, MakeAnswerData, CloseConnectionData } f
 
 const { RTCPeerConnection } = window;
 
+let counter = 0;
+
 const peerConnection = new RTCPeerConnection();
 
 export const VideoContext = createContext<VideoContextType | null>(null);
@@ -33,7 +35,9 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
       setCallCounter(prevCounter => prevCounter + 1);
 
-      if (callCounter === 2) {
+      counter++;
+
+      if (counter === 2) {
 
         setIsSecondCall(true);
         callAnswerMade(true, data.offer);
@@ -103,13 +107,14 @@ const VideoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       to: callerUserName,
       isCallAccepted
     })
-  }, [offer, socket, peerConnection, callerUserName]);
+  }, [offer, socket, peerConnection, callerUserName, callCounter]);
 
 
   const resetVideoContext = useCallback(() => {
 
-    setCallCounter(0);
+    counter = 0;
 
+    setCallCounter(0);
     setOffer(null);
     setIsSecondCall(false);
     setCallerUserName('');

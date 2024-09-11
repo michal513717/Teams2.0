@@ -17,7 +17,8 @@ export const VideoModal = () => {
     setIsCallAccepted,
     setIsRequestCallModalOpen,
     setIsVideoModalOpen,
-    isCallAccepted
+    isCallAccepted,
+    callerUserName
   } = useVideoStore();
 
   const {
@@ -100,7 +101,7 @@ export const VideoModal = () => {
 
   const resetVideo = useCallback(() => {
 
-    if(isVideoModalOpen === true) return;
+    if (isVideoModalOpen === true) return;
 
     console.info("Reset Video modal");
 
@@ -110,8 +111,8 @@ export const VideoModal = () => {
       });
     }
 
-    if(remoteStream !== null){
-      remoteStream.getTracks().forEach((track) =>{
+    if (remoteStream !== null) {
+      remoteStream.getTracks().forEach((track) => {
         track.stop();
       })
     }
@@ -124,10 +125,11 @@ export const VideoModal = () => {
   }, [localStream, remoteStream, isVideoModalOpen]);
 
   const resetAll = useCallback(() => {
-    endCall(selectedUserChat!);
+    // quick fix
+    endCall(callerUserName === null ? selectedUserChat! : callerUserName);
     resetVideo();
     resetVideoContext();
-  }, [selectedUserChat]);
+  }, [selectedUserChat, callerUserName]);
 
   return (
     <Modal
@@ -138,7 +140,7 @@ export const VideoModal = () => {
       <div className="modal-style">
         <Box position={"absolute"} right={'20px'} top={"20px"} zIndex={99} >
           <IconButton onClick={resetAll}>
-            <CloseIcon/>
+            <CloseIcon />
           </IconButton>
         </Box>
         {localStream && (
@@ -150,7 +152,7 @@ export const VideoModal = () => {
         )}
 
         {remoteStream !== null ? (
-          <video autoPlay className="video-call" ref={video => {
+          <video autoPlay className="video-call remote-call" ref={video => {
             if (video) {
               video.srcObject = remoteStream
             }
@@ -159,14 +161,18 @@ export const VideoModal = () => {
           <Box width={'100%'} height={'100%'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
             {
               isCallAccepted === false ? (
-                <>
-                  <h2>
-                    User rejected call
-                  </h2>
+                <Box display="flex" flexDirection={'column'} alignItems={'center'}>
                   <div>
-                    {countdown}
+                    <h2>
+                      User rejected call
+                    </h2>
                   </div>
-                </>
+                  <div>
+                    <h3>
+                      {countdown}
+                    </h3>
+                  </div>
+                </Box>
               ) : (<></>)
             }
             {

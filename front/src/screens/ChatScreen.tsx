@@ -4,14 +4,15 @@ import { useState, useContext, useEffect, useRef } from "react";
 import { ChatContext, ChatContextType } from "@/context/ChatContext";
 import { useAuthStore } from "@/stores/authStorage";
 import { useVideoStore } from "@/stores/videoStorage";
+import { useChatStorage } from "@/stores/chatStorage";
 
-type Props = { chat_user: string | undefined };
+type Props = { chat_user: string };
 
 const ChatScreen: React.FC<Props> = ({ chat_user }) => {
   const [input, setInput] = useState<string>("");
   const { userName } = useAuthStore();
   const { setIsVideoModalOpen } = useVideoStore();
-  const { messages, sendMessage } = useContext(ChatContext) as ChatContextType;
+  const { messages, sendMessage, chatUsers, unreadMessages, readMessage} = useContext(ChatContext) as ChatContextType;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -35,6 +36,12 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
   };
 
   useEffect(() => {
+    if(unreadMessages.includes(chat_user) === false || userName === null) return;
+
+    readMessage(chat_user, userName);
+  }, [filteredMessages])
+
+  useEffect(() => {
     scrollToBottom();
   }, [filteredMessages]);
 
@@ -42,7 +49,7 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
     <div className="chat-container">
       <div className="chat-header">
         <div>{chat_user}</div>
-        <Button variant="contained" startIcon={<CallIcon />} onClick={handleCallUser} disabled={userName === chat_user}>
+        <Button variant="contained" startIcon={<CallIcon />} onClick={handleCallUser} disabled={(userName === chat_user || chatUsers.some((item) => item.userName === chat_user && item.connected === false))}>
           Call
         </Button>
       </div>

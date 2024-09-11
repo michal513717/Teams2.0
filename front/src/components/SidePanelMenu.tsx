@@ -7,7 +7,7 @@ import { ChatContext, ChatContextType } from "@/context/ChatContext";
 
 
 export const SidePanelMenu = () => {
-  const { chatUsers, messages, getUnreadMessages, unreadMessages } = useContext(ChatContext) as ChatContextType;
+  const { chatUsers, messages, getUnreadMessages } = useContext(ChatContext) as ChatContextType;
   const { logoutUser } = useLogin();
   const { isLoading } = useChat();
 
@@ -24,10 +24,6 @@ export const SidePanelMenu = () => {
   useEffect(() => {
     getUnreadMessages();
   }, []);
-
-  useEffect(() => {
-    console.log(unreadMessages)
-  }, [unreadMessages]);
 
   const handleLogout = async () => {
     logoutUser();

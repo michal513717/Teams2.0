@@ -56,6 +56,15 @@ export class DatabaseManager extends Manager {
     return result;
   }
 
+  public async markMessageAsRead(data: UnReadMessageSchema): Promise<void>{
+    const collection = await this.getCollection<UnReadMessageSchema>("UNREAD_MESSAGES_COLLECTION");
+    
+    collection.deleteOne({
+      to: data.to,
+      from: data.from
+    });
+  }
+
   public async addNewUser(data: UserDatabaseSchema): Promise<void> {
     const collection = await this.getCollection<typeof data>("USERS_COLLECTION");
     await collection.insertOne(data);
@@ -94,6 +103,8 @@ export class DatabaseManager extends Manager {
 
   public async saveMessage(data: ConversationData): Promise<void> {
     const collection = await this.getCollection<ChatDatabaseSchema>("CHAT_COLLECTION");
+    const unreadMessagesCollection = await this.getCollection<UnReadMessageSchema>("UNREAD_MESSAGES_COLLECTION");
+
     const cursorData = await collection.find({
       members: [data.from, data.to]
     });
@@ -103,6 +114,12 @@ export class DatabaseManager extends Manager {
       this.addNewChatRecord(data);
       return;
     };
+
+    unreadMessagesCollection.insertOne({
+      _id: new ObjectId(),
+      from: data.from,
+      to: data.to
+    });
 
     collection.updateOne({
       members: [data.from, data.to]

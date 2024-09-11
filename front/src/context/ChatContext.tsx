@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useEffect, useContext, useCallback } from "react";
 import axios from "axios";
 import { getAccessToken } from "@/stores/localStorage";
 import { io } from "socket.io-client";
@@ -14,6 +14,7 @@ export interface ChatContextType {
   unreadMessages: string[];
   getUnreadMessages: () => void;
   sendMessage: (message: string, to: string) => void;
+  readMessage: (from: string, to: string) => void;
 }
 
 export const ChatContext = createContext<ChatContextType | null>(null);
@@ -109,6 +110,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         content: message.message,
         timestamp: message.timestamp,
       };
+      setUnreadMessages((prevMessages) => [...prevMessages, message.from]);
       setMessages((prevMessages) => {
         const updatedMessages = [...prevMessages, formattedMessage];
         return updatedMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
@@ -167,8 +169,15 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     }
   };
 
+  const readMessage = useCallback((from: string, to: string) => {
+    if(socket === null) return;
+    socket.emit(GLOBAL_CONFIG.SOCKET_EVENTS.MESSAGE_READ, { from, to });
+    const newUnreadMessages = unreadMessages.filter((mess) => mess !== from);
+    setUnreadMessages(newUnreadMessages);
+  }, [unreadMessages])
+
   return (
-    <ChatContext.Provider value={{ chatUsers, messages, sendMessage, getUnreadMessages, unreadMessages }}>
+    <ChatContext.Provider value={{ chatUsers, messages, sendMessage, getUnreadMessages, unreadMessages, readMessage }}>
       {children}
     </ChatContext.Provider>
   );
