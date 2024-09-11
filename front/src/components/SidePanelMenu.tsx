@@ -7,9 +7,19 @@ import { ChatContext, ChatContextType } from "@/context/ChatContext";
 
 
 export const SidePanelMenu = () => {
-  const { chatUsers } = useContext(ChatContext) as ChatContextType;
+  const { chatUsers, messages } = useContext(ChatContext) as ChatContextType;
   const { logoutUser } = useLogin();
   const { isLoading } = useChat();
+
+  const getLastMessage = (userName: string): string => {
+    const userMessages = messages.filter(
+      (msg) => msg.from === userName || msg.to === userName
+    );
+    if (userMessages.length > 0) {
+      return userMessages[userMessages.length - 1].content || "No messages";
+    }
+    return "No messages";
+  };
 
   const handleLogout = async () => {
     logoutUser();
@@ -26,6 +36,7 @@ export const SidePanelMenu = () => {
               key={`${user.userName}${index}`}
               userCardName={user.userName}
               isActive={user.connected}
+              lastMessage={getLastMessage(user.userName)}
             />
           ))
         )

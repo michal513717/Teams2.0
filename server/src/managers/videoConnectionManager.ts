@@ -3,6 +3,8 @@ import { SessionManager } from "./sessionManager";
 import { GLOBAL_CONFIG } from "../../../config.global";
 import ManagersCollection from "./managersCollection";
 import { Manager } from "../common/common.manager.config";
+import { ChatSocketType } from "../models/common.models";
+import { CallUserData, MakeAnswerData, CloseConnectionData } from "../models/video.models";
 
 export class VideoConnectionManager extends Manager{
 
@@ -18,13 +20,15 @@ export class VideoConnectionManager extends Manager{
     this.sessionManager = ManagersCollection.getManagerById<SessionManager>("sessionManager");
   }
 
-  //TODO specify types
-  public setupCallUser(socket: Socket & any): void {
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_USER, (data: any) => {
+  public setupCallUser(socket: ChatSocketType): void {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_USER, (data: CallUserData) => {
 
       const receivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
-      //TODO add error handler if reciverID is null
+      if (!receivedID) {
+        this.logger.error(`Receiver ID is null. Cannot make a call to user: ${data.to}`);
+        return;
+      }
 
       socket.to(receivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.CALL_MADE, {
         offer: data.offer,
@@ -34,13 +38,15 @@ export class VideoConnectionManager extends Manager{
     });
   }
 
-  //TODO specify types
-  public setupMakeAnswer(socket: Socket & any): void {
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.MAKE_ANSWER, (data: any) => {
+  public setupMakeAnswer(socket: ChatSocketType): void {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.MAKE_ANSWER, (data: MakeAnswerData) => {
 
       const receivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
-      //TODO add error handler if reciverID is null
+      if (!receivedID) {
+        this.logger.error(`Receiver ID is null. Cannot send answer to user: ${data.to}`);
+        return;
+      }
 
       socket.to(receivedID).emit(GLOBAL_CONFIG.SOCKET_EVENTS.ANSWER_MADE, {
         socket: socket.id,
@@ -51,9 +57,8 @@ export class VideoConnectionManager extends Manager{
     }); 
   }
 
-  //TODO specify types
-  public setupCloseConnection(socket: Socket & any): void {
-    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.END_CALL, (data: any) => {
+  public setupCloseConnection(socket: ChatSocketType): void {
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.END_CALL, (data: CloseConnectionData) => {
 
       const receivedID = this.sessionManager.findSocketIdByUserName(data.to) as string;
 
