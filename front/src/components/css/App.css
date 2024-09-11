@@ -92,6 +92,10 @@ body{
   margin-top: 10px;
 }
 
+.last-message {
+  opacity: 0.6;
+}
+
 .left-panel {
   position: fixed;
   left: 0;
