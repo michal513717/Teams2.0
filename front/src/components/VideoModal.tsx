@@ -1,4 +1,5 @@
-import { VideoContext, VideoContextType } from "./../context/VideoCallContext";
+import { VideoContextType } from "@/type/video.types";
+import { VideoContext } from "./../context/VideoCallContext";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { Box, CircularProgress, IconButton, Modal } from "@mui/material"
 import { useVideoStore } from "./../stores/videoStorage"

@@ -1,7 +1,8 @@
 import { useVideoStore } from "./../stores/videoStorage"
 import { Modal, Box, Button } from "@mui/material"
 import { useCallback, useContext } from "react";
-import { VideoContext, VideoContextType } from "./../context/VideoCallContext";
+import { VideoContextType } from "@/type/video.types";
+import { VideoContext } from "./../context/VideoCallContext";
 import { useSocketStore } from "@/stores/socketStorage";
 
 export const RequestCallModal = () => {
