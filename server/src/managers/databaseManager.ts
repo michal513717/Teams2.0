@@ -3,7 +3,7 @@ import { Collection, MongoClient, ObjectId, Timestamp } from "mongodb";
 import MongoLocalClient from "../database/index";
 import { DatabaseManagerConfig } from "../utils/configs/databaseManagerConfig";
 import { MongoDatabase } from "../models/common.models";
-import { ChatDatabaseSchema, ChatInitData, ConversationData, UserDatabaseSchema } from "../models/mongose.schema";
+import { ChatDatabaseSchema, ChatInitData, ConversationData, UnReadMessageSchema, UserDatabaseSchema } from "../models/mongose.schema";
 import { Manager } from "../common/common.manager.config";
 
 export class DatabaseManager extends Manager {
@@ -14,7 +14,8 @@ export class DatabaseManager extends Manager {
 
   public static COLLECTIONS = {
     USERS_COLLECTION: 'usersCollection',
-    CHAT_COLLECTION: 'chatCollection'
+    CHAT_COLLECTION: 'chatCollection',
+    UNREAD_MESSAGES_COLLECTION: 'unreadMessagesCollection'
   } as const;
 
   protected async init(): Promise<void> {
@@ -39,6 +40,22 @@ export class DatabaseManager extends Manager {
     return await collection.findOne({ userName: userName });
   }
 
+  public async getAllUnreadMessages(userName: string): Promise<string[]>{
+    const collection = await this.getCollection<UnReadMessageSchema>("UNREAD_MESSAGES_COLLECTION");
+    
+    const cursorData = await collection.find({
+      to: userName
+    });
+
+    const result = [];
+
+    for await (const doc of cursorData) {
+      result.push(doc.from);
+    };
+
+    return result;
+  }
+
   public async addNewUser(data: UserDatabaseSchema): Promise<void> {
     const collection = await this.getCollection<typeof data>("USERS_COLLECTION");
     await collection.insertOne(data);
@@ -50,7 +67,7 @@ export class DatabaseManager extends Manager {
 
     const cursorData = collection.find();
 
-    let result = [];
+    const result = [];
 
     for await (const doc of cursorData) {
       result.push(doc.userName);
@@ -66,7 +83,7 @@ export class DatabaseManager extends Manager {
       members: { $in: [userName] }
     });
 
-    let data = [];
+    const data = [];
 
     for await (const doc of cursorData) {
       data.push(doc);
@@ -126,7 +143,7 @@ export class DatabaseManager extends Manager {
 
   public async getUserChatHistory(userName: string) {
     const chatHistory = await this.getAllMessages(userName);
-    let result: ChatInitData[] = [];
+    const result: ChatInitData[] = [];
 
     chatHistory.forEach((chatRecord) => {
       chatRecord.messages.forEach((message) => {

@@ -13,5 +13,6 @@ export const GLOBAL_CONFIG = {
     PRIVATE_MESSAGE: 'private-message',
     USER_CONNECTED: 'user-connected',
     ALL_USERS: 'all-users',
+    MESSAGE_READ: 'message-read'
   }
 }

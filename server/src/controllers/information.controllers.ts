@@ -5,6 +5,10 @@ import { DatabaseManager } from "../managers/databaseManager";
 import { Manager } from "../common/common.manager.config";
 import { SessionManager } from "../managers/sessionManager";
 import { UserStatus } from "../models/common.models";
+import { internalServerErrorResponse, validationErrorResponse } from "../utils/responses";
+import { ZodError } from "zod";
+import { ErrorWithCode } from "../common/common.error.config";
+import { ZodGetUnreadMessagesSchema } from "../models/mongose.schema";
 
 export class InformationController extends Manager{
 
@@ -44,5 +48,35 @@ export class InformationController extends Manager{
       message: "Get all users completed request",
       result
     });
+  }
+
+
+  public getUnreadMessages = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      
+      const data = await ZodGetUnreadMessagesSchema.parseAsync(req.body);
+
+      const result = this.databaseManager.getAllUnreadMessages(data.userName);
+
+      res.status(200).json({
+        status: CommonRoutesConfig.statusMessage.SUCCESS,
+        message: "Get unread completed request",
+        result
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return validationErrorResponse(res, error);
+      }
+
+      if (error instanceof ErrorWithCode) {
+        return res.status(error.status).json(error.toJSON());
+      }
+
+      internalServerErrorResponse(res);
+    }
   }
 };

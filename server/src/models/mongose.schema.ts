@@ -22,6 +22,10 @@ export const ZodRegisterUserSchema = z.object({
   path: ["confirmPassword"]
 });
 
+export const ZodGetUnreadMessagesSchema = z.object({
+  userName: z.string()
+});
+
 export type ChatDatabaseSchema = {
   _id: ObjectId;
   members: string[];
@@ -40,6 +44,10 @@ export type ChatInitData = {
   to: string;
   message: string;
   timestamp: Date;
+};
+export type UnReadMessageSchema = {
+  from: string;
+  to: string;
 };
 
 export type ConversationData = ChatInitData;

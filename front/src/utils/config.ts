@@ -7,6 +7,7 @@ export const CONFIG = {
     REGISTER_ROUTE: '/auth/register',
     GET_ALL_USERS: '/info/allUsers',
     CHECK_TOKEN: '/auth/tokenCheck',
-    ALL_USERS: '/info/allUsers'
+    ALL_USERS: '/info/allUsers',
+    UNREAD_MESSAGES: '/info/unReadMessages'
   }
 }

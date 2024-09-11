@@ -21,9 +21,10 @@ export class InformationRoute extends CommonRoutesConfig {
 
     const infoRouter = express.Router();
 
-    const { getAllUsersController } = this.informationController
+    const { getAllUsersController, getUnreadMessages } = this.informationController
 
     infoRouter.get('/allUsers', Authenticator.verifyTokenMiddleware, getAllUsersController);
+    infoRouter.get('/unReadMessages', Authenticator.verifyTokenMiddleware, getUnreadMessages);
 
     this.app.use('/info', infoRouter);
 
