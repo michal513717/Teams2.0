@@ -74,6 +74,7 @@ body{
 }
 
 .description {
+  position: relative;
   display: inline-block;
 }
 
@@ -104,10 +105,6 @@ body{
 
 .user {
   padding: 10px;
-}
-
-.description {
-  display: inline-block;
 }
 
 .new-messages {

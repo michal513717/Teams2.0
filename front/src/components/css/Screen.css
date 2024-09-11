@@ -136,3 +136,13 @@ body {
 .user-selected{
   background-color: #4b015a;
 }
+
+.toRead {
+  position: absolute;
+  top: 15px;
+  left: 190px;
+}
+
+.hidden {
+  display: none;
+}

@@ -12,7 +12,7 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
   const { userName } = useAuthStore();
   const { setIsVideoModalOpen } = useVideoStore();
   const { messages, sendMessage } = useContext(ChatContext) as ChatContextType;
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleSendMessage = () => {
@@ -42,7 +42,7 @@ const ChatScreen: React.FC<Props> = ({ chat_user }) => {
     <div className="chat-container">
       <div className="chat-header">
         <div>{chat_user}</div>
-        <Button variant="contained" startIcon={<CallIcon />} onClick={handleCallUser}>
+        <Button variant="contained" startIcon={<CallIcon />} onClick={handleCallUser} disabled={userName === chat_user}>
           Call
         </Button>
       </div>
