@@ -4,27 +4,7 @@ import { GLOBAL_CONFIG } from "../../../config.global";
 import ManagersCollection from "./managersCollection";
 import { Manager } from "../common/common.manager.config";
 import { ChatSocketType } from "../models/common.models";
-
-type CallUserData = {
-  offer: {
-    sdp: string;
-    type: 'offer';
-  };
-  to: string;
-}
-
-type MakeAnswerData = {
-  answer: {
-    sdp: string;
-    type: 'answer';
-  };
-  isCallAccepted: boolean;
-  to: string;
-}
-
-type CloseConnectionData = {
-  to: string;
-}
+import { CallUserData, MakeAnswerData, CloseConnectionData } from "../models/video.models";
 
 export class VideoConnectionManager extends Manager{
 
