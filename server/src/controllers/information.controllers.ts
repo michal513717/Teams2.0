@@ -57,10 +57,10 @@ export class InformationController extends Manager{
     next: NextFunction
   ) => {
     try {
-      
-      const data = await ZodGetUnreadMessagesSchema.parseAsync(req.body);
 
-      const result = this.databaseManager.getAllUnreadMessages(data.userName);
+      const data = await ZodGetUnreadMessagesSchema.parseAsync(req.query);
+
+      const result = await this.databaseManager.getAllUnreadMessages(data.userName);
 
       res.status(200).json({
         status: CommonRoutesConfig.statusMessage.SUCCESS,

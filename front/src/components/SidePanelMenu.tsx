@@ -1,13 +1,13 @@
 import { Box, Button, CircularProgress } from "@mui/material"
 import UserCard from "./userCard";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useChat } from "@/hooks/useChat";
 import { useLogin } from "@/hooks/useLogin";
 import { ChatContext, ChatContextType } from "@/context/ChatContext";
 
 
 export const SidePanelMenu = () => {
-  const { chatUsers, messages } = useContext(ChatContext) as ChatContextType;
+  const { chatUsers, messages, getUnreadMessages, unreadMessages } = useContext(ChatContext) as ChatContextType;
   const { logoutUser } = useLogin();
   const { isLoading } = useChat();
 
@@ -20,6 +20,14 @@ export const SidePanelMenu = () => {
     }
     return "No messages";
   };
+
+  useEffect(() => {
+    getUnreadMessages();
+  }, []);
+
+  useEffect(() => {
+    console.log(unreadMessages)
+  }, [unreadMessages]);
 
   const handleLogout = async () => {
     logoutUser();

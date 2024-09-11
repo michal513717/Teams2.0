@@ -8,10 +8,11 @@ import { GLOBAL_CONFIG } from "./../../../config.global";
 import { useSocketStore } from "@/stores/socketStorage";
 import { ChatUser, Message, UserStatus } from "@/type/common.types";
 
-
 export interface ChatContextType {
   chatUsers: ChatUser[];
   messages: Message[];
+  unreadMessages: string[];
+  getUnreadMessages: () => void;
   sendMessage: (message: string, to: string) => void;
 }
 
@@ -20,6 +21,7 @@ export const ChatContext = createContext<ChatContextType | null>(null);
 const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { userName } = useAuthStore();
   const { setSocket, socket } = useSocketStore();
+  const [unreadMessages, setUnreadMessages] = useState<string[]>([]);
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -36,13 +38,30 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
       const users = response.data.result.map((user: UserStatus) => ({
         userName: user.userName,
-        connected: user.connected, // Default status
+        connected: user.connected
       }));
       setChatUsers(users);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
   };
+
+  const getUnreadMessages = async () => {
+    try {
+      const accessToken = getAccessToken();
+
+      const response = await axios({
+        url: CONFIG.SERVER_URL + CONFIG.END_POINTS.UNREAD_MESSAGES,
+        method: "GET",
+        params: { userName },
+        headers: { Authorization: `Bearer ${accessToken}`}
+      });
+
+      setUnreadMessages(response.data.result as string []);
+    } catch (error) {
+      console.error("Error fetching unread messages", error);
+    }
+  }
 
   useEffect(() => {
 
@@ -68,7 +87,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
-      console.log("Connected to WebSocket server");
+      console.info("Connected to WebSocket server");
     });
 
     newSocket.on(GLOBAL_CONFIG.SOCKET_EVENTS.INIT_CHATS, (chatHistory: Message[]) => {
@@ -149,7 +168,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   };
 
   return (
-    <ChatContext.Provider value={{ chatUsers, messages, sendMessage }}>
+    <ChatContext.Provider value={{ chatUsers, messages, sendMessage, getUnreadMessages, unreadMessages }}>
       {children}
     </ChatContext.Provider>
   );
