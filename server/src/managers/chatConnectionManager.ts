@@ -71,8 +71,8 @@ export class ChatConnectionManager extends Manager{
       this.databaseManager.markMessageAsRead({from, to});
     })
 
-    socket.on('disconnect', async () => {
-      socket.broadcast.emit('user-disconnected', socket.userName);
+    socket.on(GLOBAL_CONFIG.SOCKET_EVENTS.USER_DISCONNECT, async () => {
+      socket.broadcast.emit(GLOBAL_CONFIG.SOCKET_EVENTS.USER_DISCONNECTED, socket.userName);
       this.sessionManager.removeSession(socket.socketId);
     });
   }
