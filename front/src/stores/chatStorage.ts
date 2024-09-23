@@ -2,6 +2,8 @@ import { UserStatus } from "@/type/common.types";
 import { ChatStore } from "@/type/stores.types";
 import { create } from "zustand";
 
+
+// TODO remove or refactor
 export const useChatStorage = create<ChatStore>((set) => ({
   messages: null,
   chatUsers: [],
